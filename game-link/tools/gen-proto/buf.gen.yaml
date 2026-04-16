@@ -1,0 +1,8 @@
+version: v2
+inputs:
+  - directory: ../../protos
+plugins:
+  - local: protoc-gen-es
+    strategy: all
+    opt: target=ts
+    out: ../../clients/ts/cocos/baccarat/assets/shared/protos

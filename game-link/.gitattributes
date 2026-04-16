@@ -1,0 +1,23 @@
+# 設定預設行為
+* text=auto
+
+# 強制 Shell 腳本使用 LF 換行符號（避免 WSL 執行問題）
+*.sh text eol=lf
+*.bash text eol=lf
+
+# 其他需要 LF 的檔案類型
+*.yml text eol=lf
+*.yaml text eol=lf
+Makefile text eol=lf
+Dockerfile text eol=lf
+
+# 二進位檔案（不做轉換）
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary

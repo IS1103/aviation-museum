@@ -1,0 +1,59 @@
+# 客戶端資源（4.4GB+ 美術資源）
+clients/
+
+# 文檔
+docs/
+*.md
+!README.md
+
+# Go 編譯產物
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# IDE 和編輯器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# 環境變數和配置
+*.env
+!*.env.example
+.env.*
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cocos Creator
+clients/cc/library/
+clients/cc/temp/
+clients/cc/local/
+clients/cc/build/
+
+# 臨時文件
+*.tmp
+*.bak
+*.log
+tmp/
+temp/
+
+# Go workspace 文件（Docker 內會重新生成）
+go.work.sum
+
+# 其他服務（構建時只需要當前服務）
+# 注意：Dockerfile 中應該只 COPY 需要的模組
+

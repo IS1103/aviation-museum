@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package gate;
+option go_package = "internal.proto/pb/gate;gate";
+
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+
+service GateService {
+  rpc Request(Pack) returns (google.protobuf.Any);
+  rpc Notify(Pack) returns (google.protobuf.Empty);
+  rpc Trigger(google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc Fetch(google.protobuf.Empty) returns (google.protobuf.Any);
+}
+
+// === 原 base.proto：閘道通用結構（Pack/UidReq/Auth/ErrorDetail）===
+message Pack {
+  uint32 packType = 1;  // 0: request, 1: response 2: notify 3: trigger, 4: fetch
+  uint32 reqId = 2;
+  string svt = 3;       // 服務類型：baccarat, holdem, match, profile, gate 等（必需）
+  string method = 4;    // 方法名：bet, chat, getGameData, entry, leave 等（必需）
+  bool success = 5;
+  string msg = 6;       // 錯誤訊息
+  google.protobuf.Any info = 7;  // 請求參數或回應資料
+  string detail = 8;    // 錯誤細節 (JSON): {"loc":"bet.go:21","err":"db timeout","stack":"..."}
+}
+
+message UidReq {
+  uint32 uid = 1;  // 僅需 UID 的請求（查詢個人資料、定位、狀態等）
+}
+
+message Auth {
+  bool legal = 1;
+  string token = 2;
+  uint32 uid = 3;
+}
+
+message ErrorDetail {
+  string msg = 1;    // 使用者友善訊息
+  string loc = 2;    // 位置 "bet.go:21"
+  string stack = 3;  // 完整堆疊
+}
+
+message PushErrorToUidsReq {
+  repeated uint32 uids = 1;
+  ErrorDetail error = 2;
+}
+
+message EntryAndLeaveInfo {
+  string svt = 1;
+  uint32 action = 2; // 1: entry, 2: leave
+  uint32 uid = 3;   // 玩家 uid
+  string rid = 4;   // 房間 id（entry 回傳時由服務端填入，供客戶端寫入 GameDataStore）
+  string msg = 5;   // 可選，離開原因等（如：餘額不足被剔除）
+}
+
+// OnStateChangePayload 用於 Gate 推播 gate/onStateChange（如 Rollback 返回大廳）
+message OnStateChangePayload {
+  string state = 1;   // 目標狀態，如 "lobby"
+  string msg = 2;     // 任意字串，供客戶端切換頁面或提示用
+  string match_id = 3; // 如 "m_20260215_123"，客戶端可校對後忽略過期推播
+}
+
+// message EntryAndLeaveResp {
+//   // bool ok = 1;
+//   // string svt = 2;// 目前所在的服務類型
+//   string svt = 1;// 目前所在的服務類型
+//   uint32 uid = 2; // 玩家 uid
+// }
+
+message PushToUidsReq {
+  repeated uint32 uids = 1;
+  string svt = 2;      // 服務類型：baccarat, holdem, match, profile, gate 等
+  string method = 3;   // 方法名：update, playerJoin, playerLeave, chat 等
+  google.protobuf.Any data = 4;
+}
+
+// KickUserReq 踢掉指定用戶連線的請求（kickUsers forward 用 uids；既有 uid/reason 可保留）
+message KickUserReq {
+  uint32 uid = 1;      // 要踢掉的用戶 UID（舊欄位，可保留）
+  string reason = 2;   // 踢人原因：duplicate_login, admin_kick, etc.
+  repeated uint32 uids = 3;  // kickUsers 用，單人時傳 [uid]
+}
+
+// KickUserResp 踢人結果
+message KickUserResp {
+  bool ok = 1;         // 是否成功踢掉
+  repeated uint32 uids = 2; // 未踢掉的用戶 UID list
+}
+
+// ValidateReq/ValidateResp 用於 gate forward 路徑 auth/validate（Pack.Info）（原 gate-auth.proto）
+message ValidateReq {
+  string token = 1;
+  string gate_sid = 2;  // 當前 Gate 實例 ID
+  string device = 3;    // 裝置，如 web / iphone / android；可為空，空時後端視為 unknown
+}
+message ValidateResp {
+  uint32 uid = 1;   // 通過時為玩家 uid，不通過為 0
+  string msg = 2;   // 錯誤或附註訊息
+}
+
+// PingReq/PingResp 用於應用層 RTT 測量（gate/ping）
+message PingReq {}
+message PingResp {}

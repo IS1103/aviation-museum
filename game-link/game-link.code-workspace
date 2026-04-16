@@ -1,0 +1,14 @@
+{
+  "folders": [
+    {
+      "path": ".",
+    },
+    {
+      "path": "../../lotify/example",
+    },
+  ],
+  "settings": {
+    "go.useLanguageServer": true,
+    "markdown-preview-enhanced.mermaidTheme": "dark",
+  },
+}

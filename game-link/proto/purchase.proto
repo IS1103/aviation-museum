@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package purchase;
+option go_package = "internal.proto/pb/purchase;purchase";
+
+// GetList：client 取得所有可購買品項
+message GetList_Req {}
+
+message GetList_Resp {
+  repeated PurchaseItem items = 1;
+}
+
+message PurchaseItem {
+  string product_id = 1;
+  string name = 2;
+  string description = 3;
+  uint32 coin_type = 4;
+  int32 coin_amount = 5;
+  // 可擴充：價格、貨幣、訂閱週期等
+}
+
+// Buy：client 購買品項
+message Buy_Req {
+  string product_id = 1;
+}
+
+message Buy_Resp {
+  string order_id = 1;
+  uint32 coin_type = 2;
+  int32 new_balance = 3;
+}
+
+// PlayerAssets：service 廣播玩家資產（method: playerAssets）
+message PlayerAssets {
+  uint32 uid = 1;
+  uint32 coin_type = 2;
+  int32 coin = 3;
+  // 可擴充：道具、訂閱狀態等
+}

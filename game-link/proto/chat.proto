@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package chat;
+option go_package = "internal.proto/pb/chat;chat";
+
+import "game.proto";
+
+// Chat 相關 message 用於 gate forward 路徑（Pack.Info）
+// ChannelReq 訂閱／取消訂閱頻道共用請求（method 區分 subscribeChannel / unsubscribeChannel）
+message ChannelReq {
+  uint32 uid = 1;        // 玩家 UID
+  string channel = 2;   // 頻道名稱，格式：room/{svt}/{rid}
+}
+
+// ChannelResp 訂閱／取消訂閱頻道共用回應；錯誤訊息通過 gate.Pack.msg 傳遞
+message ChannelResp {
+  string channel = 1;   // 頻道名稱
+  uint32 uid = 2;       // 玩家 UID
+}
+
+// UnsubscribeAllChannels_Req 取消所有頻道訂閱請求
+message UnsubscribeAllChannels_Req {
+  uint32 uid = 1;        // 玩家 UID
+}
+
+// UnsubscribeAllChannels_Resp 取消所有頻道訂閱回應
+// 錯誤訊息通過 gate.Pack.msg 傳遞
+message UnsubscribeAllChannels_Resp {
+  uint32 uid = 1;        // 玩家 UID
+  uint32 channelCount = 2; // 取消訂閱的頻道數量
+}
+
+// SendMessage_Req 發送訊息到頻道請求
+message SendMessage_Req {
+  uint32 uid = 1;        // 發送者 UID
+  string channel = 2;    // 頻道名稱，格式：room/{svt}/{rid}
+  game.Chat message = 3;  // 聊天訊息（包含 nickname 和 message）
+}
+
+// SendMessage_Resp 發送訊息到頻道回應
+// 錯誤訊息通過 gate.Pack.msg 傳遞
+message SendMessage_Resp {
+  string channel = 1;    // 頻道名稱
+  uint32 recipientCount = 2; // 接收訊息的訂閱者數量
+}

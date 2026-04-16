@@ -1,0 +1,90 @@
+syntax = "proto3";
+package game;
+option go_package = "internal.proto/pb/game;game";
+
+// 房間類型枚舉
+enum RoomType {
+  PUBLIC = 0;            // 公開房間
+  PRIVATE = 1;           // 私人房間
+  TOURNAMENT = 2;        // 比賽房間
+}
+
+// MatchEntry：entry 請求 payload（plan-simplify-match-dispatch：湊桌必須帶 rule，未傳則回傳錯誤）
+message MatchEntry {
+  string svt = 1;       // 服務類型（如 "holdem"、"baccarat"）
+  uint32 minPlayer = 2; // 最少玩家數
+  uint32 maxPlayer = 3; // 最多玩家數
+  Player player = 4;   // 進入的玩家本人（單一）
+  string rule = 5;     // 湊桌規則（如 JSON）；為空時不得入隊，Game 推送錯誤
+}
+
+message MatchRoom {
+  string rid = 1;                         // 房間 ID
+  string svt = 2;                // 服務類型 ID（如 "baccarat"、"holdem"、"match"、"lobby"）
+  uint32 minPlayer = 3;                   // 最少玩家數
+  uint32 maxPlayer = 4;                   // 最多玩家數
+  uint32 createdAt = 5;                   // 房間創建時間（Unix 時間戳）
+  repeated Player players = 6;            // 玩家列表
+  string rule_hash = 7;                   // 湊桌 queue 的 ruleHash，供 Game 註冊 matchable_rooms 用（CreateRoom 時由 Match 傳入）
+}
+
+// 玩家資訊
+message Player {
+  // 玩家基本資訊
+  uint32 uid = 1;                 // 玩家 ID
+  string nickname = 2;               // 玩家暱稱
+  uint32 coinType = 3;               // 玩家幣別
+  int32 coin = 4;                    // 玩家持有金額
+  string avatar = 5;                // 玩家頭像
+
+  string svt = 6;        // 服務類型 ID（"lobby": 在大廳，其他: 在遊戲中，如 "baccarat"、"holdem"）
+}
+
+message JoinLeave_Req {
+  string svt = 1;                // 服務類型 ID（如 "baccarat"、"holdem"、"match"、"lobby"）
+  string rid = 2;                         // 房間 ID
+  bool isJoin = 3;                         // 是否加入, true:加入, false:離開
+  string password = 4;                     // 房間密碼（私人房間用）
+  string token = 5;                         // 房間 Token
+}
+
+message JoinLeave_Resp {
+  string rid = 1;                         // 房間 ID
+  string token = 2;                       // 房間 Token
+}
+
+// 聊天訊息
+message Chat {
+  string nickname = 1;                              // 玩家 ID
+  string message = 2;                          // 對話內容或符號
+}
+
+// EntryResponse：用於 holdem/entered 等進入遊戲的通知
+message EntryResponse {
+  bool success = 1;  // 進入成功標記
+}
+
+// MatchableRoomRegister：Game 呼叫 Match API 註冊或更新可被湊桌加入的房間（plan-simplify-match-dispatch §3.3）
+message MatchableRoomRegister {
+  string svt = 1;
+  int32 min_p = 2;
+  string rule_hash = 3;
+  string table_id = 4;
+  int32 current_count = 5;
+  int32 need_count = 6;
+}
+
+// MatchableRoomRemove：Game 呼叫 Match API 移除可湊桌房間（滿員、開局或解散時）
+message MatchableRoomRemove {
+  string svt = 1;
+  int32 min_p = 2;
+  string rule_hash = 3;
+  string table_id = 4;
+}
+
+// AddPlayerToRoomReq：Match Timer 呼叫 Game 補人時使用（plan-simplify-match-dispatch）
+message AddPlayerToRoomReq {
+  string table_id = 1;
+  repeated uint32 uids = 2;
+  string rule_hash = 3; // 該 queue 的 ruleHash，用於 matchable_rooms key
+}

@@ -1,0 +1,102 @@
+syntax = "proto3";
+package history;
+option go_package = "internal.proto/pb/history;history";
+
+// History 服務：gate forward 路徑 Pack.Info（baccarat/holdem → history/saveGameHistory）
+
+// SaveGameHistory_Req 儲存遊戲記錄的請求
+message SaveGameHistory_Req {
+  uint32 uid = 1;           // 玩家 UID
+  string game_type = 2;     // 遊戲類型（svt），決定寫入哪張表，如 "baccarat", "holdem"
+  string room_id = 3;       // 房間 ID
+  uint32 round_number = 4;   // 回合數
+  string round_serial = 8;  // 回合流水號（同一回合的所有玩家記錄使用相同的流水號）
+  int64 bet_amount = 5;     // 總下注金額
+  int64 win_amount = 6;     // 總贏得金額（含本金返還）
+  string game_data_json = 7; // 遊戲詳情（JSON 字串）
+}
+
+// SaveGameHistory_Resp 儲存遊戲記錄的回應
+message SaveGameHistory_Resp {
+  int64 history_id = 1;     // 新建記錄的 ID
+}
+
+// GetGameHistory_Req 查詢遊戲記錄的請求
+message GetGameHistory_Req {
+  string game_type = 1;     // 遊戲類型（必填）
+  uint32 uid = 2;           // 玩家 UID（可選）
+  string start_date = 3;    // 開始日期（ISO 格式，可選）
+  string end_date = 4;      // 結束日期（ISO 格式，可選）
+  uint32 page = 5;          // 頁碼（預設 1）
+  uint32 page_size = 6;     // 每頁筆數（預設 20）
+}
+
+// GameHistoryRecord 遊戲記錄
+message GameHistoryRecord {
+  int64 id = 1;             // 記錄 ID
+  uint32 uid = 2;           // 玩家 UID
+  string firebase_uid = 3;   // Firebase UID
+  string room_id = 4;       // 房間 ID
+  uint32 round_number = 5;   // 回合數
+  string round_serial = 11; // 回合流水號（同一回合的所有玩家記錄使用相同的流水號）
+  int64 bet_amount = 6;     // 總下注金額
+  int64 win_amount = 7;     // 總贏得金額
+  int64 net_result = 8;     // 淨收益
+  string game_data_json = 9; // 遊戲詳情（JSON 字串）
+  string created_at = 10;   // 創建時間（ISO 格式）
+}
+
+// GetGameHistory_Resp 查詢遊戲記錄的回應
+message GetGameHistory_Resp {
+  repeated GameHistoryRecord records = 1; // 記錄列表
+  uint32 total = 2;         // 總筆數
+  uint32 page = 3;          // 當前頁碼
+  uint32 page_size = 4;     // 每頁筆數
+  uint32 total_pages = 5;   // 總頁數
+}
+
+// GetGameStats_Req 取得遊戲統計的請求
+message GetGameStats_Req {
+  string game_type = 1;     // 遊戲類型（可選，空字串表示所有遊戲）
+  uint32 days = 2;          // 統計天數（預設 30）
+}
+
+// GameStats 遊戲統計資料
+message GameStats {
+  string game_type = 1;     // 遊戲類型
+  uint32 total_games = 2;   // 總遊戲數
+  uint32 unique_players = 3; // 唯一玩家數
+  int64 total_bet = 4;      // 總下注金額
+  int64 total_payout = 5;   // 總支出金額
+  int64 house_profit = 6;    // 莊家利潤
+}
+
+// GetGameStats_Resp 取得遊戲統計的回應
+message GetGameStats_Resp {
+  repeated GameStats stats = 1; // 統計資料列表
+  repeated string supported_game_types = 2; // 支援的遊戲類型列表
+}
+
+// GetPlayerStats_Req 取得玩家統計的請求
+message GetPlayerStats_Req {
+  uint32 uid = 1;           // 玩家 UID（必填）
+  string game_type = 2;     // 遊戲類型（可選，空字串表示所有遊戲）
+}
+
+// PlayerGameStats 玩家遊戲統計
+message PlayerGameStats {
+  uint32 uid = 1;           // 玩家 UID
+  string firebase_uid = 2;  // Firebase UID
+  string game_type = 3;     // 遊戲類型
+  uint32 total_games = 4;   // 總遊戲數
+  int64 total_bet = 5;      // 總下注金額
+  int64 total_win = 6;      // 總贏得金額
+  int64 net_profit = 7;     // 淨收益
+  double win_rate = 8;      // 勝率（百分比）
+  string last_played = 9;   // 最後遊玩時間（ISO 格式）
+}
+
+// GetPlayerStats_Resp 取得玩家統計的回應
+message GetPlayerStats_Resp {
+  repeated PlayerGameStats stats = 1; // 統計資料列表
+}

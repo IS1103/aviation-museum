@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package air_museum;
+option go_package = "air-museum/proto/pb;air_museum";
+option csharp_namespace = "AirMuseum";
+
+// =============================================================================
+// air-museum 設計：兩端共用 auth/validate；其餘各只用一個 WebSocket API。
+// - 玩家端唯一 API：notify/air_museum/player（PlayerInput：action=ENTRY|LEAVE|INPUT）
+// - 投影端唯一 API：notify/air_museum/state（GameState：state）
+// Service：連線、投影↔玩家轉發／廣播。
+// 玩家顯示資料請由各端自行處理（或另接後端）；Postgres 表 player 由服務啟動時建立。
+// =============================================================================
+
+// 玩家／投影端動作：此訊息代表什麼操作（entry、leave、input 等）
+enum Action {
+  ACTION_UNSPECIFIED = 0;
+  ACTION_ENTRY       = 1;  // 入桌
+  ACTION_LEAVE       = 2;  // 離桌
+  ACTION_INPUT       = 3;  // 遊戲中輸入（axis_x/axis_y/seq 有效）
+}
+
+// 遊戲階段／狀態（可入桌／Demo／遊戲中／滿員）
+enum GamePhase {
+  GAME_PHASE_UNSPECIFIED   = 0;
+  GAME_PHASE_WAITING_ENTRY = 1;  // 可入桌，等待玩家 entry
+  GAME_PHASE_DEMO          = 2;  // Demo 狀態
+  GAME_PHASE_PLAYING       = 3;  // 遊戲中
+  GAME_PHASE_FULL          = 4;  // 滿員
+}
+
+// 遊戲狀態：用於 pushGameState（投影端→Server）與 gameStateEvent（Server 廣播→所有玩家）
+// 手柄端依 state 與 uids 取得房內成員列表
+message GameState {
+  GamePhase state = 1;        // 遊戲當前狀態
+  repeated uint32 uids = 2;   // 當前房內玩家 uid 列表
+}
+
+// 玩家→投影端統一承載：action（entry／leave／input）、uid、輸入軸與序號（input 時使用）
+// 玩家送時 uid 可省略，由 Server 轉發時填入；投影端依 action 決定行為
+message PlayerInput {
+  Action action = 1;   // 此次代表的操作
+  uint32 uid = 2;      // 玩家端可不填，Server 轉發時填入
+  float axis_x = 3;     // 左右，建議 -1～1（action=INPUT 時使用）
+  float axis_y = 4;     // 上下，建議 -1～1（action=INPUT 時使用）
+  uint32 seq = 5;       // 序號（action=INPUT 時使用）
+}
+
+// 錯誤通知：Server → Client（notify/error）；client 須訂閱此事件
+message ErrorNotify {
+  string msg = 1;   // 錯誤訊息，如「主機已重連，請點擊登入重新 entry」
+}

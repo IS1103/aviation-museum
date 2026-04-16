@@ -1,0 +1,14 @@
+go 1.24.3
+
+use (
+	./internal
+	./proto
+	./services/air-museum
+	./utils
+)
+
+replace (
+	google.golang.org/genproto => google.golang.org/genproto v0.0.0-20260209200024-4cfbd4190f57
+	google.golang.org/genproto/googleapis/api => google.golang.org/genproto/googleapis/api v0.0.0-20260209200024-4cfbd4190f57
+	google.golang.org/genproto/googleapis/rpc => google.golang.org/genproto/googleapis/rpc v0.0.0-20260209200024-4cfbd4190f57
+)

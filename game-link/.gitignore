@@ -1,0 +1,142 @@
+# Go 相關
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work.sum
+
+# Go 編譯產出
+/bin/
+/gate
+/auth
+/chat
+/match
+/profile
+# /pkg/  # 已改用 internal/ 目錄存放源代碼，不需要忽略
+vendor/
+/clients/art/
+
+# 測試覆蓋率
+*.coverage
+coverage.txt
+*.prof
+
+# Node.js 相關
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json.bak
+.npm
+.yarn-integrity
+
+# 編譯與建置產出
+dist/
+build/
+*.o
+*.a
+
+# Protocol Buffers 生成的文件（如果需要保留請註解掉）
+# proto/pb/
+
+# IDE 相關
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# 日誌檔案
+*.log
+logs/
+*.log.*
+
+# 環境變數與配置
+.env
+.env.local
+.env.*.local
+*.env
+config.local.*
+
+# 臨時文件
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+
+# 自定義忽略目錄
+dontGit/
+
+# 作業系統生成
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# 測試與覆蓋率報告
+coverage/
+*.cover
+*.coverprofile
+test-results/
+TEST*.xml
+
+# 資料庫檔案
+*.db
+*.sqlite
+*.sqlite3
+
+# 壓縮檔案
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# 大型媒體文件
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.mkv
+*.tiff
+*.raw
+
+# 調試文件
+debug
+*.pprof
+
+# Unity（clients/csharp/unity/ 下所有專案通用）
+clients/csharp/unity/**/[Ll]ibrary/
+clients/csharp/unity/**/[Tt]emp/
+clients/csharp/unity/**/[Oo]bj/
+clients/csharp/unity/**/[Bb]uild/
+clients/csharp/unity/**/[Bb]uilds/
+clients/csharp/unity/**/[Ll]ogs/
+clients/csharp/unity/**/[Uu]ser[Ss]ettings/
+clients/csharp/unity/**/MemoryCaptures/
+clients/csharp/unity/**/Record/
+clients/csharp/unity/**/Unused/
+clients/csharp/unity/**/[Gg]radle/
+clients/csharp/unity/**/[Ee]xported[Oo]bj/
+clients/csharp/unity/**/[Ee]xport/
+clients/csharp/unity/**/[Ll]ocal[Cc]ache/
+clients/csharp/unity/**/[Aa]uto[Cc]reated/
+clients/csharp/unity/**/[Cc]rash[Rr]eports/
+clients/csharp/unity/**/.vs/
+clients/csharp/unity/**/*.pidb
+clients/csharp/unity/**/*.pidb.meta
+clients/csharp/unity/**/*.booproj
+clients/csharp/unity/**/*.svd
+clients/csharp/unity/**/*.pdb
+clients/csharp/unity/**/*.pdb.meta
+clients/csharp/unity/**/*.mdb
+clients/csharp/unity/**/*.mdb.meta
+clients/csharp/unity/**/*.opendb
+clients/csharp/unity/**/*.VC.db
+clients/csharp/unity/**/sysinfo.txt
+clients/csharp/unity/**/*.stackdump
+

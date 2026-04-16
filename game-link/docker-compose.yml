@@ -1,0 +1,103 @@
+services:
+  # 服務發現 etcd（用於服務註冊和發現）
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.17
+    container_name: game-link-etcd
+    ports:
+      - '2379:2379'
+      - '2380:2380'
+    environment:
+      - ETCD_NAME=etcd0
+      - ETCD_DATA_DIR=/etcd-data
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://localhost:2379,http://etcd:2379
+      - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
+      - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://etcd:2380
+      - ETCD_INITIAL_CLUSTER=etcd0=http://etcd:2380
+      - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster-1
+      - ETCD_INITIAL_CLUSTER_STATE=new
+    volumes:
+      - game_link_etcd_data:/etcd-data
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'etcdctl', 'endpoint', 'health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 推播路由 Redis（uid -> gateSid）
+  redis:
+    image: redis:7-alpine
+    container_name: game-link-redis
+    ports:
+      - '6379:6379'
+    command:
+      ['redis-server', '--appendonly', 'yes', '--appendfsync', 'everysec']
+    volumes:
+      - game_link_redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # 元數據 Postgres（供後台/服務存放管理與設定資料）
+  # 注意：使用 5433 埠避免與 WSL 內的 PostgreSQL（5432）衝突
+  metadata-postgres:
+    image: postgres:16-alpine
+    container_name: metadata-postgres
+    environment:
+      - POSTGRES_DB=${META_POSTGRES_DB:-metadata}
+      - POSTGRES_USER=${META_POSTGRES_USER:-metadata}
+      - POSTGRES_PASSWORD=${META_POSTGRES_PASSWORD:-metadata}
+    ports:
+      - '${META_POSTGRES_PORT:-5433}:5432'
+    volumes:
+      - metadata_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  # 遊戲歷史記錄 Postgres（供 history 服務存放遊戲記錄）
+  # 注意：使用 5434 埠避免與 metadata Postgres（5433）衝突
+  history-postgres:
+    image: postgres:16-alpine
+    container_name: history-postgres
+    environment:
+      - POSTGRES_DB=${HISTORY_POSTGRES_DB:-gamehistory}
+      - POSTGRES_USER=${HISTORY_POSTGRES_USER:-gamehistory}
+      - POSTGRES_PASSWORD=${HISTORY_POSTGRES_PASSWORD:-gamehistory}
+    ports:
+      - '${HISTORY_POSTGRES_PORT:-5434}:5432'
+    volumes:
+      - history_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  # etcd GUI 網頁版管理界面（etcdkeeper - 支持 etcd v3 API）
+  # 注意：etcdkeeper 需要通過 Web UI 手動配置連接
+  # 訪問 http://localhost:8080/etcdkeeper/ 後，在界面頂部的輸入框中輸入：
+  # http://etcd:2379 （必須使用 Docker 網絡中的服務名稱，因為 etcdkeeper 後端運行在容器中）
+  etcd-gui:
+    image: evildecay/etcdkeeper:latest
+    container_name: game-link-etcd-gui
+    ports:
+      - '8080:8080'
+    depends_on:
+      etcd:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  game_link_etcd_data:
+  metadata_pg_data:
+  history_pg_data:
+  game_link_redis_data:

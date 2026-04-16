@@ -1,0 +1,61 @@
+,zh-Hant,en-US
+loading.btn_confirm,確定,OK
+loading.connecting_disconnected_title,連線已斷開,Connection lost
+loading.connecting_disconnected_message,點擊按鈕回到 Loading 重新連線,Tap to return to Loading and reconnect
+loading.connecting_failed_title,連線失敗,Connection failed
+loading.connecting_failed_message,無法連接到伺服器，點擊確定返回大廳,Unable to connect to the server. Tap OK to return to lobby
+loading.leave_title,離開,Leave
+loading.cannot_leave_title,無法離開,Cannot leave
+loading.no_lobby,沒有大廳,No lobby
+loading.unknown_error,發生未知錯誤,An unknown error occurred
+loading.auth_failed_title,驗證失敗,Verification failed
+loading.auth_failed_please_relogin,請重新登入,Please sign in again
+loading.init_failed_title,初始化失敗,Initialization failed
+loading.error_missing_url_params,網址缺少登入參數，請從大廳進入遊戲,Missing login parameters in URL. Please enter from the lobby
+loading.error_unknown,未知錯誤,Unknown error
+loading.progress_init,正在初始化...,Initializing...
+loading.progress_using_fake_data,已使用假資料,Using test data
+loading.progress_got_auth,已取得認證資訊,Authentication received
+loading.progress_connecting,正在建立連線...,Connecting...
+loading.progress_connected_entering,連線成功，正在進入遊戲...,"Connected, entering game..."
+loading.progress_check_assets,檢查資產、正在湊桌,"Checking assets, matching..."
+loading.progress_entered_loading_scene,進入遊戲成功，準備載入場景...,"Entered successfully, loading scene..."
+loading.progress_loading_scene,正在載入遊戲場景...,Loading game scene...
+loading.progress_loading_resources,正在載入遊戲場景資源...,Loading scene resources...
+loading.progress_load_failed,載入場景失敗,Failed to load scene
+loading.progress_load_done,載入完成，正在進入遊戲...,"Load complete, entering game..."
+loading.error_fake_data_format,假資料格式錯誤：缺少 idToken 或 gateHost,Invalid test data: missing idToken or gateHost
+loading.error_parent_data_incomplete,從父網頁取得的資料不完整（缺少 idToken 或 gateHost）,Incomplete data from parent (missing idToken or gateHost)
+loading.error_user_info_failed,取得用戶資訊失敗,Failed to get user info
+loading.error_not_in_iframe,無法取得父頁面，請確認遊戲是否在 iframe 中運行,Parent page unavailable. Please run the game inside an iframe
+loading.error_request_timeout,請求用戶資訊超時,Request for user info timed out
+game.error_title,錯誤,Error
+game.operation_failed,操作失敗,Operation failed
+game.operation_failed_title,操作失敗,Operation failed
+game.conn_not_ready,連線未就緒,Connection not ready
+game.state_invalid,遊戲狀態無效,Invalid game state
+game.client_not_ready,客戶端未初始化,Client not initialized
+game.anonymous,匿名,Anonymous
+conn.not_ready,連線未就緒,Connection not ready
+conn.auth_failed_relogin,驗證失敗，請重新登入,Verification failed. Please sign in again.
+conn.kicked_other_device,您的帳號已在其他裝置登入，此連線將被關閉。,Your account was logged in on another device. This connection will be closed.
+conn.error_generic,發生錯誤,An error occurred
+conn.duplicate_login_title,重複登入,Duplicate login
+conn.duplicate_login_message,您的帳號在其他地方登入，此連線已被關閉。請更新至最新版本。,Your account logged in elsewhere. This connection has been closed. Please update to the latest version.
+conn.request_failed,請求失敗,Request failed
+conn.all_requests_aborted,所有請求已中止,All requests have been aborted
+conn.connection_closed,連線已關閉,Connection closed
+conn.client_closed,客戶端已關閉,Client closed
+state_machine.busy,狀態切換進行中，請等待上一個轉換完成再執行。,State transition in progress. Please wait.
+util.image_size_invalid,圖片尺寸無效,Invalid image size
+util.canvas_context_failed,無法獲取 Canvas 上下文,Failed to get Canvas context
+holdem.table_dissolved_title,牌桌解散,Table dissolved
+holdem.table_dissolved_message,牌桌因人數不足即將解散，請返回大廳。,The table will be dissolved due to insufficient players. Please return to the lobby.
+holdem.leave_table_title,離開牌桌,Leave table
+holdem.wait_blinds,等待小盲注和大盲注下注...,Waiting for small blind and big blind...
+holdem.deal_hole,發底牌...,Dealing hole cards...
+holdem.deal_flop,發三張公共牌...,Dealing the flop...
+holdem.deal_turn,發轉牌...,Dealing the turn...
+holdem.deal_river,發河牌...,Dealing the river...
+holdem.call,跟注,Call
+holdem.check,過牌,Check

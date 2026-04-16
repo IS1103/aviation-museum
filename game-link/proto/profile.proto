@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package profile;
+option go_package = "internal.proto/pb/profile;profile";
+
+// Profile 相關 message 用於 gate forward 路徑（Pack.Info）
+// getProfile / getLocate / checkPlayerStatus 的請求改用 gate.UidReq
+
+message GetLocateResp {
+  string svt = 1;
+}
+
+// GetProfile_Resp will be packed into gate.Pack.info
+message GetProfile_Resp {
+  uint32 uid = 1;
+  string nickname = 2;
+  string avatar = 3;
+  int32 level = 4;     // 0=root, 1=gm, 2=normal
+  string svt = 5;      // server type, e.g. lobby, baccarat, holdem
+  string rid = 6;      // room id
+}
+
+message UpdateProfile_Req {
+  uint32 uid = 1;
+  string nickname = 2;
+  string avatar = 3;
+  string svt = 4;
+  string rid = 5;
+}
+
+// UpdateProfile_Resp will be packed into gate.Pack.info
+message UpdateProfile_Resp {
+  uint32 uid = 1;
+  string nickname = 2;
+  string avatar = 3;
+  string svt = 4;
+  string rid = 5;
+}
+
+// CheckPlayerStatus_Resp will be packed into gate.Pack.info
+message CheckPlayerStatus_Resp {
+  uint32 uid = 1;
+  bool isBanned = 2;
+  bool canJoinGame = 3;
+  string reason = 4;
+}
+
+// Wallet 相關消息（從 wallet service 整合而來）
+message SetWalletDelta_Req {
+  uint32 uid = 1;
+  uint32 coinType = 2;
+  int32 delta = 3;
+  string reason = 4; // 增減原因
+}
+
+message SetWalletDelta_Resp {
+  uint32 uid = 1;
+  uint32 coinType = 2;
+  int32 newBalance = 3; // 更新後的餘額
+}
+
+message GetWallet_Req {
+  uint32 uid = 1;
+  uint32 coinType = 2;
+}
+
+message GetWallet_Resp {
+  uint32 uid = 1;
+  uint32 coinType = 2;
+  int32 coin = 3;
+}
+
+// GetGameInfo：依 svt 取得遊戲資訊（含 rule），供 Game service 啟動時拉取
+message GetGameInfo_Req {
+  string svt = 1;
+}
+
+message GetGameInfo_Resp {
+  string svt = 1;
+  string rule = 2; // JSON string，即 player_modes 整份物件
+  string game_settings_json = 3;       // JSON string，即 game_settings，結構同 rule，key 如 "standard"
+  string game_settings_schema_json = 4; // JSON string，即 game_settings_schema，欄位定義
+}

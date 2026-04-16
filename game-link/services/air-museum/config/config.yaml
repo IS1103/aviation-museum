@@ -1,0 +1,14 @@
+# air-museum 直連服務：僅 WS，無 gRPC/Redis/etcd
+service:
+  svt: air_museum
+  service_id: air-museum-local
+  ws_port: 8770
+  http_port: 8771 # Gin HTTP 端口（預留擴充）
+  max_players: 10 # 單房人數上限
+
+# Postgres：不填 dsn 時依環境變數 META_POSTGRES_HOST/PORT/USER/PASSWORD 連線，資料庫固定為 air_museum（可設 AIR_MUSEUM_POSTGRES_DB 覆寫）。啟動時若無該庫會自動建立（填 dsn 時亦會依 dsn 內 dbname 連到 postgres 嘗試建庫）。
+# 與 profile 同主機／帳密，僅 dbname 不同。若需自訂完整連線字串可填 dsn：
+# postgres:
+#   dsn: "postgres://metadata:metadata@localhost:5433/air_museum?sslmode=disable"
+#jdbc:postgresql://localhost:5433/air_museum?user=metadata&password=metadata&sslmode=disable
+postgres: {}

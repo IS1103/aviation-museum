@@ -1,0 +1,8 @@
+[submodule "clients/ts/cocos/holdem/assets/game-link-cocos-sdk"]
+	path = clients/ts/cocos/holdem/assets/game-link-cocos-sdk
+	url = git@github.com:IS1103/game-link-cocos-sdk.git
+	ignore = all
+[submodule "clients/ts/cocos/baccarat/assets/game-link-cocos-sdk"]
+	path = clients/ts/cocos/baccarat/assets/game-link-cocos-sdk
+	url = git@github.com:IS1103/game-link-cocos-sdk.git
+	ignore = all
