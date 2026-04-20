@@ -50,3 +50,16 @@ message PlayerInput {
 message ErrorNotify {
   string msg = 1;   // 錯誤訊息，如「主機已重連，請點擊登入重新 entry」
 }
+
+// 玩家註冊請求：玩家端送 request/air_museum/register，伺服器寫入 player 表後回傳 uid
+// sex 約定：0=未指定、1=男、2=女
+message RegisterReq {
+  string name = 1;  // 玩家姓名（必填）
+  int32 age = 2;    // 年齡
+  int32 sex = 3;    // 性別：0 未指定 / 1 男 / 2 女
+}
+
+// 玩家註冊回應：新建 player 列的 uid，後續流程用此 uid 關聯
+message RegisterResp {
+  uint32 uid = 1;   // DB 自動產生的 player.uid
+}

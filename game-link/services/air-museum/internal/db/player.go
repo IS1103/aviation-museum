@@ -161,3 +161,21 @@ func Close() error {
 	}
 	return db.Close()
 }
+
+// CreatePlayer 新增一筆玩家資料（name/age/sex）到 player 表，回傳自動產生的 uid。
+// 其餘欄位使用 DB 預設值（avatar_*、game_score、landing_score、ranking、session 皆為 0；creattime 為 NOW()）。
+func CreatePlayer(ctx context.Context, name string, age, sex int) (uint32, error) {
+	if db == nil {
+		return 0, fmt.Errorf("db not initialized")
+	}
+	var uid uint32
+	query := fmt.Sprintf(`
+		INSERT INTO %s (name, age, sex)
+		VALUES ($1, $2, $3)
+		RETURNING uid
+	`, qualifiedTable(playerTable))
+	if err := db.QueryRowContext(ctx, query, name, age, sex).Scan(&uid); err != nil {
+		return 0, fmt.Errorf("insert player: %w", err)
+	}
+	return uid, nil
+}

@@ -1,18 +1,36 @@
 // WebCamDisplay.cs - 開啟攝像頭並在 Unity 內顯示即時畫面（自拍預覽）
-// 使用方式：掛在 GameObject 上，指定 Display Target 為 RawImage 或 Renderer，執行後會自動開啟第一個可用鏡頭。
+// 使用方式：掛在 GameObject 上，指定 Display Raw Image，執行後會自動開啟第一個可用鏡頭。
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace AirMuseum
 {
     public class WebCamDisplay : MonoBehaviour
     {
-        [Header("顯示目標（二選一）")]
+        /// <summary>確認拍照後的事件，會把拍到的 Texture2D 一併傳出。</summary>
+        [System.Serializable]
+        public class PhotoConfirmedEvent : UnityEvent<Texture2D> { }
+
+        /// <summary>畫面縮放模式。</summary>
+        public enum ScaleMode
+        {
+            /// <summary>保持比例並完整顯示畫面，容器多餘區域留空（letterbox / pillarbox）。</summary>
+            Fit,
+            /// <summary>保持比例並填滿容器，超出部分會被裁切。</summary>
+            Fill,
+            /// <summary>不保持比例，直接拉伸填滿容器（原本的行為）。</summary>
+            Stretch,
+        }
+
+        [Header("顯示目標")]
         [Tooltip("UI 上用來顯示攝像頭畫面的 RawImage")]
         [SerializeField] private RawImage displayRawImage;
-        [Tooltip("若不用 UI，可改為 3D 物體上的 Renderer（會用主紋理顯示）")]
-        [SerializeField] private Renderer displayRenderer;
+
+        [Header("顯示設定")]
+        [Tooltip("畫面縮放模式：Fit 保持比例留邊、Fill 保持比例裁切、Stretch 直接拉伸")]
+        [SerializeField] private ScaleMode scaleMode = ScaleMode.Fit;
 
         [Header("選填")]
         [Tooltip("是否使用前鏡頭（手機自拍較直觀），PC 可能無前鏡頭")]
@@ -20,16 +38,70 @@ namespace AirMuseum
         [Tooltip("是否水平鏡像（自拍時較自然）")]
         [SerializeField] private bool mirrorHorizontal = true;
 
+        [Header("拍照 UI")]
+        [Tooltip("拍照按鈕：按下後暫停攝像頭畫面（凍結在當下這一幀），再按一次會重拍")]
+        [SerializeField] private Button captureButton;
+        [Tooltip("確認按鈕：按下後把凍結的畫面輸出為 Texture2D")]
+        [SerializeField] private Button confirmButton;
+
+        [Header("多國語言 Key（lan.csv）")]
+        [Tooltip("拍照按鈕的翻譯 key（尚未拍照時顯示）")]
+        [SerializeField] private string captureLangKey = "camera.btn_capture";
+        [Tooltip("重拍按鈕的翻譯 key（已拍照後顯示在同一顆按鈕上）")]
+        [SerializeField] private string retakeLangKey = "camera.btn_retake";
+        [Tooltip("確認按鈕的翻譯 key")]
+        [SerializeField] private string confirmLangKey = "camera.btn_confirm";
+
+        [Header("事件")]
+        [Tooltip("按下「確認」按鈕後觸發，參數為拍到的照片 Texture2D")]
+        [SerializeField] private PhotoConfirmedEvent onPhotoConfirmed;
+
         private WebCamTexture _webCamTexture;
         private bool _started;
+        private bool _isCaptured;
+        private Texture2D _capturedPhoto;
+
+        // 按鈕上的文字（會自動從 Button 底下找 Text 元件）
+        private Text _captureButtonLabel;
+        private Text _confirmButtonLabel;
+        private bool _languageCallbackBound;
+
+        // RawImage 在 Editor 中設定的原始大小（作為「可用顯示區域」使用）
+        private Vector2 _originalRectSize;
+        private bool _originalRectSizeCached;
+
+        // 快取上次套用的布局資訊，避免每幀重複設定 RectTransform
+        private Vector2 _lastContainerSize;
+        private int _lastTexWidth;
+        private int _lastTexHeight;
+        private float _lastRotationAngle;
+        private ScaleMode _lastScaleMode;
+        private bool _lastMirrorHorizontal;
+        private bool _lastVerticallyMirrored;
 
         private void Start()
         {
+            SetupButtons();
             StartCoroutine(StartWebCam());
         }
 
         private void OnDestroy()
         {
+            if (captureButton != null) captureButton.onClick.RemoveListener(ToggleCapture);
+            if (confirmButton != null) confirmButton.onClick.RemoveListener(ConfirmPhoto);
+
+            if (_languageCallbackBound && SetLang.Instance != null)
+            {
+                SetLang.Instance.OnLanguageChanged -= OnLanguageChanged;
+            }
+            _languageCallbackBound = false;
+
+            if (_capturedPhoto != null)
+            {
+                Destroy(_capturedPhoto);
+                _capturedPhoto = null;
+            }
+
             StopWebCam();
         }
 
@@ -38,11 +110,60 @@ namespace AirMuseum
             StopWebCam();
         }
 
+        private void SetupButtons()
+        {
+            if (captureButton != null)
+            {
+                captureButton.onClick.RemoveListener(ToggleCapture);
+                captureButton.onClick.AddListener(ToggleCapture);
+                captureButton.gameObject.SetActive(true);
+                _captureButtonLabel = captureButton.GetComponentInChildren<Text>(true);
+            }
+
+            if (confirmButton != null)
+            {
+                confirmButton.onClick.RemoveListener(ConfirmPhoto);
+                confirmButton.onClick.AddListener(ConfirmPhoto);
+                // 還沒拍照前先隱藏確認按鈕
+                confirmButton.gameObject.SetActive(false);
+                _confirmButtonLabel = confirmButton.GetComponentInChildren<Text>(true);
+            }
+
+            // 訂閱語言變更事件，切語言時自動更新按鈕文字
+            if (!_languageCallbackBound && SetLang.Instance != null)
+            {
+                SetLang.Instance.OnLanguageChanged += OnLanguageChanged;
+                _languageCallbackBound = true;
+            }
+
+            ApplyButtonLabels();
+        }
+
+        private void OnLanguageChanged(Language _)
+        {
+            ApplyButtonLabels();
+        }
+
+        /// <summary>依照目前的拍照狀態與語言，更新按鈕上的文字。</summary>
+        private void ApplyButtonLabels()
+        {
+            if (_captureButtonLabel != null)
+            {
+                string key = _isCaptured ? retakeLangKey : captureLangKey;
+                _captureButtonLabel.text = SetLang.T(key);
+            }
+
+            if (_confirmButtonLabel != null)
+            {
+                _confirmButtonLabel.text = SetLang.T(confirmLangKey);
+            }
+        }
+
         private IEnumerator StartWebCam()
         {
-            if (displayRawImage == null && displayRenderer == null)
+            if (displayRawImage == null)
             {
-                Debug.LogWarning("[WebCamDisplay] 請指定 Display Raw Image 或 Display Renderer。");
+                Debug.LogWarning("[WebCamDisplay] 請指定 Display Raw Image。");
                 yield break;
             }
 
@@ -89,49 +210,149 @@ namespace AirMuseum
             }
 
             ApplyTexture();
+            UpdateLayoutAndUV(true);
             _started = true;
         }
 
         private void ApplyTexture()
         {
-            if (_webCamTexture == null) return;
+            if (_webCamTexture == null || displayRawImage == null) return;
 
-            Texture tex = _webCamTexture;
-            if (mirrorHorizontal)
+            displayRawImage.texture = _webCamTexture;
+            displayRawImage.color = Color.white;
+        }
+
+        /// <summary>
+        /// 依照 WebCamTexture 的原生寬高比，調整 RawImage 的大小與旋轉，
+        /// 同時把 mirrorHorizontal 與 videoVerticallyMirrored 套用到 uvRect。
+        /// </summary>
+        private void UpdateLayoutAndUV(bool forceRefresh)
+        {
+            if (_webCamTexture == null || displayRawImage == null) return;
+
+            int texW = _webCamTexture.width;
+            int texH = _webCamTexture.height;
+            // WebCamTexture 初始化後、第一次拿到影像前，width/height 會是 16（Unity 預設值），直接跳過
+            if (texW <= 16 || texH <= 16) return;
+
+            float angle = _webCamTexture.videoRotationAngle;
+            bool verticallyMirrored = _webCamTexture.videoVerticallyMirrored;
+
+            RectTransform rt = displayRawImage.rectTransform;
+            RectTransform parent = rt.parent as RectTransform;
+
+            // 第一次取得有效尺寸時，把當下 Editor 設定的 RawImage 尺寸當作「可用顯示區域」快取起來
+            if (!_originalRectSizeCached)
             {
-                // 用 scale -1 做水平鏡像（RawImage 用 rectTransform.localScale）
-                if (displayRawImage != null)
+                Vector2 currentSize = rt.rect.size;
+                if (currentSize.x > 0f && currentSize.y > 0f)
                 {
-                    displayRawImage.texture = tex;
-                    displayRawImage.uvRect = new Rect(1, 0, -1, 1);
-                    displayRawImage.color = Color.white;
-                }
-                if (displayRenderer != null && displayRenderer.material != null)
-                {
-                    displayRenderer.material.mainTexture = tex;
-                    displayRenderer.material.mainTextureScale = new Vector2(-1, 1);
-                    displayRenderer.material.mainTextureOffset = new Vector2(1, 0);
+                    _originalRectSize = currentSize;
+                    _originalRectSizeCached = true;
                 }
             }
-            else
+
+            if (_originalRectSizeCached)
             {
-                if (displayRawImage != null)
+                Vector2 containerSize = _originalRectSize;
+
+                bool layoutChanged = forceRefresh
+                    || containerSize != _lastContainerSize
+                    || texW != _lastTexWidth
+                    || texH != _lastTexHeight
+                    || !Mathf.Approximately(angle, _lastRotationAngle)
+                    || scaleMode != _lastScaleMode;
+
+                if (layoutChanged)
                 {
-                    displayRawImage.texture = tex;
-                    displayRawImage.uvRect = new Rect(0, 0, 1, 1);
-                    displayRawImage.color = Color.white;
+                    // 若鏡頭回傳的畫面被旋轉 90/270 度，顯示時的寬高需要交換
+                    bool swap = Mathf.Approximately(Mathf.Abs(angle) % 180f, 90f);
+                    float srcW = swap ? texH : texW;
+                    float srcH = swap ? texW : texH;
+                    float srcAspect = srcW / srcH;
+                    float containerAspect = containerSize.x / containerSize.y;
+
+                    float targetW, targetH;
+                    switch (scaleMode)
+                    {
+                        case ScaleMode.Stretch:
+                            targetW = containerSize.x;
+                            targetH = containerSize.y;
+                            break;
+                        case ScaleMode.Fill:
+                            if (srcAspect > containerAspect)
+                            {
+                                targetH = containerSize.y;
+                                targetW = containerSize.y * srcAspect;
+                            }
+                            else
+                            {
+                                targetW = containerSize.x;
+                                targetH = containerSize.x / srcAspect;
+                            }
+                            break;
+                        case ScaleMode.Fit:
+                        default:
+                            if (srcAspect > containerAspect)
+                            {
+                                targetW = containerSize.x;
+                                targetH = containerSize.x / srcAspect;
+                            }
+                            else
+                            {
+                                targetH = containerSize.y;
+                                targetW = containerSize.y * srcAspect;
+                            }
+                            break;
+                    }
+
+                    // 套用旋轉（對齊 WebCamTexture.videoRotationAngle），以 pivot 為中心
+                    rt.localEulerAngles = new Vector3(0f, 0f, -angle);
+
+                    // 若旋轉導致寬高交換，實際 rect.size 的 x/y 要以「旋轉前」的軸向為準
+                    Vector2 targetSize = swap
+                        ? new Vector2(targetH, targetW)
+                        : new Vector2(targetW, targetH);
+
+                    // 不動 anchorMin/Max、pivot、anchoredPosition，只改 sizeDelta
+                    // rect.size = (anchorMax - anchorMin) * parentSize + sizeDelta
+                    // => sizeDelta = targetSize - (anchorMax - anchorMin) * parentSize
+                    Vector2 anchorSpan = rt.anchorMax - rt.anchorMin;
+                    Vector2 parentSize = parent != null ? parent.rect.size : Vector2.zero;
+                    rt.sizeDelta = new Vector2(
+                        targetSize.x - anchorSpan.x * parentSize.x,
+                        targetSize.y - anchorSpan.y * parentSize.y);
+
+                    _lastContainerSize = containerSize;
+                    _lastTexWidth = texW;
+                    _lastTexHeight = texH;
+                    _lastRotationAngle = angle;
+                    _lastScaleMode = scaleMode;
                 }
-                if (displayRenderer != null && displayRenderer.material != null)
-                    displayRenderer.material.mainTexture = tex;
+            }
+
+            // uvRect：處理水平鏡像與垂直翻轉（行動平台有時需要）
+            if (forceRefresh
+                || mirrorHorizontal != _lastMirrorHorizontal
+                || verticallyMirrored != _lastVerticallyMirrored)
+            {
+                float ux = mirrorHorizontal ? 1f : 0f;
+                float uw = mirrorHorizontal ? -1f : 1f;
+                float uy = verticallyMirrored ? 1f : 0f;
+                float uh = verticallyMirrored ? -1f : 1f;
+                displayRawImage.uvRect = new Rect(ux, uy, uw, uh);
+
+                _lastMirrorHorizontal = mirrorHorizontal;
+                _lastVerticallyMirrored = verticallyMirrored;
             }
         }
 
-        private void Update()
+        private void LateUpdate()
         {
-            // 若用 Renderer 且材質尚未設定，每幀試一次（避免 Play() 後紋理尚未就緒）
-            if (_started && displayRenderer != null && displayRenderer.material != null &&
-                displayRenderer.material.mainTexture != _webCamTexture)
-                ApplyTexture();
+            if (!_started || _webCamTexture == null) return;
+
+            // 每幀更新布局（內部有快取，只在尺寸／參數變更時才真的重設 RectTransform）
+            UpdateLayoutAndUV(false);
         }
 
         private void StopWebCam()
@@ -149,8 +370,6 @@ namespace AirMuseum
                 displayRawImage.texture = null;
                 displayRawImage.uvRect = new Rect(0, 0, 1, 1);
             }
-            if (displayRenderer != null && displayRenderer.material != null)
-                displayRenderer.material.mainTexture = null;
         }
 
         /// <summary>是否已成功開啟並顯示攝像頭。</summary>
@@ -158,5 +377,84 @@ namespace AirMuseum
 
         /// <summary>目前使用的 WebCamTexture（可供拍照等進階使用）。</summary>
         public WebCamTexture WebCamTexture => _webCamTexture;
+
+        /// <summary>是否已按下拍照按鈕、畫面已凍結（尚未確認）。</summary>
+        public bool IsCaptured => _isCaptured;
+
+        /// <summary>已確認的照片（在按下「確認」後才會有值）。</summary>
+        public Texture2D CapturedPhoto => _capturedPhoto;
+
+        /// <summary>
+        /// 拍照按鈕按下時的行為：
+        /// - 還沒拍時：凍結畫面、顯示確認按鈕。
+        /// - 已經拍了：恢復預覽（重拍）、隱藏確認按鈕。
+        /// </summary>
+        public void ToggleCapture()
+        {
+            if (_isCaptured) Retake();
+            else CapturePhoto();
+        }
+
+        /// <summary>
+        /// 拍照：暫停攝像頭畫面，讓顯示停在當下這一幀，並顯示確認按鈕。
+        /// </summary>
+        public void CapturePhoto()
+        {
+            if (_webCamTexture == null || !_started) return;
+            if (_isCaptured) return;
+
+            _webCamTexture.Pause();
+            _isCaptured = true;
+
+            if (confirmButton != null) confirmButton.gameObject.SetActive(true);
+            ApplyButtonLabels();
+        }
+
+        /// <summary>
+        /// 確認：把凍結的畫面擷取成 Texture2D，透過 onPhotoConfirmed 事件送出。
+        /// </summary>
+        public void ConfirmPhoto()
+        {
+            if (!_isCaptured || _webCamTexture == null) return;
+
+            int w = _webCamTexture.width;
+            int h = _webCamTexture.height;
+            if (w <= 16 || h <= 16) return;
+
+            // 釋放上一張（避免重複按造成記憶體洩漏）
+            if (_capturedPhoto != null)
+            {
+                Destroy(_capturedPhoto);
+                _capturedPhoto = null;
+            }
+
+            _capturedPhoto = new Texture2D(w, h, TextureFormat.RGB24, false);
+            _capturedPhoto.SetPixels(_webCamTexture.GetPixels());
+            _capturedPhoto.Apply();
+
+            onPhotoConfirmed?.Invoke(_capturedPhoto);
+        }
+
+        /// <summary>
+        /// 重拍：恢復攝像頭畫面，隱藏確認按鈕。
+        /// </summary>
+        public void Retake()
+        {
+            if (_webCamTexture != null && !_webCamTexture.isPlaying)
+            {
+                _webCamTexture.Play();
+            }
+
+            _isCaptured = false;
+            if (_capturedPhoto != null)
+            {
+                Destroy(_capturedPhoto);
+                _capturedPhoto = null;
+            }
+
+            if (captureButton != null) captureButton.gameObject.SetActive(true);
+            if (confirmButton != null) confirmButton.gameObject.SetActive(false);
+            ApplyButtonLabels();
+        }
     }
 }
