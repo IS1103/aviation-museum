@@ -9,7 +9,7 @@ option csharp_namespace = "AirMuseum";
 // - 玩家端唯一 API：notify/air_museum/player（PlayerInput：action=ENTRY|LEAVE|INPUT）
 // - 投影端唯一 API：notify/air_museum/state（GameState：state）
 // Service：連線、投影↔玩家轉發／廣播。
-// 玩家顯示資料請由各端自行處理（或另接後端）；Postgres 表 player 由服務啟動時建立。
+// 玩家顯示資料請由各端自行處理（或另接後端）；Postgres 表 player 由服務啟動時建立（uid、session、name、age、sex、avatar_*、game_score、landing_score、ranking、creattime 等）。
 // =============================================================================
 
 // 玩家／投影端動作：此訊息代表什麼操作（entry、leave、input 等）

@@ -15,7 +15,12 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-const playerTable = "player"
+const (
+	schemaName   = "air_museum"
+	playerTable  = "player"
+	missionTable = "mission"
+	logTable     = "log"
+)
 
 var (
 	once sync.Once
@@ -90,18 +95,63 @@ func quoteIdent(name string) string {
 	return `"` + strings.ReplaceAll(name, `"`, `""`) + `"`
 }
 
+// qualifiedTable 回傳 "schema"."table" 形式的 schema-qualified 識別子，
+// 避免連線帳號於 public schema 無 CREATE 權限時失敗（PG 15+ 常見）。
+func qualifiedTable(table string) string {
+	return quoteIdent(schemaName) + "." + quoteIdent(table)
+}
+
 func ensureTable(ctx context.Context) error {
-	_, err := db.ExecContext(ctx, fmt.Sprintf(`
+	// 先建立專屬 schema，避開 public 權限問題（SQLSTATE 3F000）。
+	if _, err := db.ExecContext(ctx, fmt.Sprintf(
+		`CREATE SCHEMA IF NOT EXISTS %s`, quoteIdent(schemaName),
+	)); err != nil {
+		return fmt.Errorf("create schema %s: %w", schemaName, err)
+	}
+
+	if _, err := db.ExecContext(ctx, fmt.Sprintf(`
 		CREATE TABLE IF NOT EXISTS %s (
-			id SERIAL PRIMARY KEY,
+			uid SERIAL PRIMARY KEY,
+			session INT NOT NULL DEFAULT 0,
 			name TEXT NOT NULL DEFAULT '',
 			age INT NOT NULL DEFAULT 0,
 			sex INT NOT NULL DEFAULT 0,
-			avatar JSONB NOT NULL DEFAULT '{}'::jsonb,
-			score INT NOT NULL DEFAULT 0
+			avatar_glasses INT NOT NULL DEFAULT 0,
+			avatar_helmet INT NOT NULL DEFAULT 0,
+			avatar_eyes INT NOT NULL DEFAULT 0,
+			avatar_mouth INT NOT NULL DEFAULT 0,
+			game_score INT NOT NULL DEFAULT 0,
+			landing_score INT NOT NULL DEFAULT 0,
+			ranking INT NOT NULL DEFAULT 0,
+			creattime TIMESTAMPTZ NOT NULL DEFAULT NOW()
 		);
-	`, quoteIdent(playerTable)))
-	return err
+	`, qualifiedTable(playerTable))); err != nil {
+		return fmt.Errorf("create %s: %w", playerTable, err)
+	}
+
+	if _, err := db.ExecContext(ctx, fmt.Sprintf(`
+		CREATE TABLE IF NOT EXISTS %s (
+			session SERIAL PRIMARY KEY,
+			mission_num INT NOT NULL DEFAULT 0,
+			landing_type INT NOT NULL DEFAULT 0,
+			created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+		);
+	`, qualifiedTable(missionTable))); err != nil {
+		return fmt.Errorf("create %s: %w", missionTable, err)
+	}
+
+	if _, err := db.ExecContext(ctx, fmt.Sprintf(`
+		CREATE TABLE IF NOT EXISTS %s (
+			id BIGSERIAL PRIMARY KEY,
+			type INT NOT NULL DEFAULT 0,
+			msg JSONB NOT NULL DEFAULT '{}'::JSONB,
+			creattime TIMESTAMPTZ NOT NULL DEFAULT NOW()
+		);
+	`, qualifiedTable(logTable))); err != nil {
+		return fmt.Errorf("create %s: %w", logTable, err)
+	}
+
+	return nil
 }
 
 // Close 關閉 DB 連線
