@@ -47,6 +47,8 @@ namespace AirMuseum
         [Header("臉部分析（選填）")]
         [Tooltip("按下「確認」後自動執行的臉部分析元件；null 則跳過")]
         [SerializeField] private FaceAnalyzer faceAnalyzer;
+        [Tooltip("每次按下「確認」時先清空，再寫入本次臉部分析（性別／年齡／眼鏡）")]
+        [SerializeField] private Text logLabel;
 
         [Header("多國語言 Key（lan.csv）")]
         [Tooltip("拍照按鈕的翻譯 key（尚未拍照時顯示）")]
@@ -435,6 +437,9 @@ namespace AirMuseum
             int h = _webCamTexture.height;
             if (w <= 16 || h <= 16) return;
 
+            if (logLabel != null)
+                logLabel.text = string.Empty;
+
             // 釋放上一張（避免重複按造成記憶體洩漏）
             if (_capturedPhoto != null)
             {
@@ -451,7 +456,7 @@ namespace AirMuseum
             AnalyzeFaceAndLog(_capturedPhoto);
         }
 
-        /// <summary>呼叫 FaceAnalyzer 做推論，並把性別／年齡／眼鏡結果印到 Console。</summary>
+        /// <summary>呼叫 FaceAnalyzer 做推論，並把性別／年齡／眼鏡結果印到 Console 與 logLabel。</summary>
         private void AnalyzeFaceAndLog(Texture2D photo)
         {
             if (faceAnalyzer == null) return;
@@ -459,7 +464,10 @@ namespace AirMuseum
             var r = faceAnalyzer.Analyze(photo);
             if (!r.success)
             {
-                Debug.LogWarning("[WebCamDisplay] 臉部分析失敗（模型未載入或輸出異常）");
+                const string warn = "[WebCamDisplay] 臉部分析失敗（模型未載入或輸出異常）";
+                Debug.LogWarning(warn);
+                if (logLabel != null)
+                    logLabel.text = "臉部分析失敗（模型未載入或輸出異常）";
                 return;
             }
 
@@ -467,7 +475,12 @@ namespace AirMuseum
                 ? (r.wearsGlasses ? "有戴眼鏡" : "沒戴眼鏡")
                 : "未判斷（未提供眼鏡模型）";
 
+            string genderText = r.gender == FaceAnalyzer.Gender.Male ? "男" : "女";
+            string labelBlock = $"性別：{genderText}\n年齡：{r.age}\n眼鏡：{glassesText}";
+
             Debug.Log($"[WebCamDisplay] 臉部分析結果 → 性別: {r.gender} | 年齡: {r.age} | 眼鏡: {glassesText}");
+            if (logLabel != null)
+                logLabel.text = labelBlock;
         }
 
         /// <summary>

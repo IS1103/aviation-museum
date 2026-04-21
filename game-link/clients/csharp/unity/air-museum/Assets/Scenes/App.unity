@@ -3324,6 +3324,7 @@ MonoBehaviour:
   captureButton: {fileID: 1922658743}
   confirmButton: {fileID: 2085923783}
   faceAnalyzer: {fileID: 1383535619}
+  logLabel: {fileID: 1204487047}
   captureLangKey: camera.btn_capture
   retakeLangKey: camera.btn_retake
   confirmLangKey: camera.btn_confirm
