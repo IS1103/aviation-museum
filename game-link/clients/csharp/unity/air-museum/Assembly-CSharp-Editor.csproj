@@ -631,10 +631,6 @@
       <HintPath>Library\PackageCache\com.unity.ext.nunit@d8c07649098d\net40\unity-custom\nunit.framework.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="websocket-sharp">
-      <HintPath>C:\Users\o_or\Downloads\Tripo3d_Unity_Bridge-latest\Tripo3d_Unity_Bridge\Editor\Plugins\websocket-sharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.Plastic.Antlr3.Runtime">
       <HintPath>Library\PackageCache\com.unity.collab-proxy@e566cd3e7623\Lib\Editor\Unity.Plastic.Antlr3.Runtime.dll</HintPath>
       <Private>False</Private>
@@ -1502,7 +1498,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp.csproj" />
-    <ProjectReference Include="Tripo3D.UnityBridge.Editor.csproj" />
   </ItemGroup>
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
   <ItemGroup>
