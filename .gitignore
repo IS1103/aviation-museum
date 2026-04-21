@@ -1,0 +1,6 @@
+buffalo_s.zip
+glasses-detector-1.0.4.zip
+*.zip
+
+# 超過 GitHub 100MB 限制的大型模型檔
+game-link/clients/csharp/unity/air-museum/Assets/Models/1k3d68.onnx
