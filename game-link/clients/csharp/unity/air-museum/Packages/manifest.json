@@ -2,7 +2,6 @@
   "dependencies": {
     "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask#2.5.10",
     "com.gameworkstore.googleprotobufunity": "https://github.com/GameWorkstore/google-protobuf-unity.git#3.15.2012",
-    "com.tripo3d.unitybridge": "file:C:/Users/o_or/Downloads/Tripo3d_Unity_Bridge-latest/Tripo3d_Unity_Bridge",
     "com.unity.ai.inference": "2.5.0",
     "com.unity.ai.navigation": "2.0.10",
     "com.unity.collab-proxy": "2.11.3",

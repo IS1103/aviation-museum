@@ -83,6 +83,14 @@ namespace AirMuseum
         private bool _lastMirrorHorizontal;
         private bool _lastVerticallyMirrored;
 
+        /// <summary>實機上 RawImage 需額外翻轉時，與 videoRotationAngle 的 Z 一併套用。</summary>
+        private bool _useDeviceRawImageFlip;
+
+        private void Awake()
+        {
+            _useDeviceRawImageFlip = !Application.isEditor;
+        }
+
         private void Start()
         {
             SetupButtons();
@@ -310,8 +318,10 @@ namespace AirMuseum
                             break;
                     }
 
-                    // 套用旋轉（對齊 WebCamTexture.videoRotationAngle），以 pivot 為中心
-                    rt.localEulerAngles = new Vector3(0f, 0f, -angle);
+                    // 套用旋轉（對齊 WebCamTexture.videoRotationAngle），以 pivot 為中心；實機上可額外翻轉 XY
+                    rt.localEulerAngles = _useDeviceRawImageFlip
+                        ? new Vector3(180f, 180f, -angle)
+                        : new Vector3(0f, 0f, -angle);
 
                     // 若旋轉導致寬高交換，實際 rect.size 的 x/y 要以「旋轉前」的軸向為準
                     Vector2 targetSize = swap

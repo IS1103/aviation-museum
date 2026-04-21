@@ -14,14 +14,6 @@
       "dependencies": {},
       "hash": "655ece78bda22e0aa28593d8dddccbca6de719bb"
     },
-    "com.tripo3d.unitybridge": {
-      "version": "file:C:/Users/o_or/Downloads/Tripo3d_Unity_Bridge-latest/Tripo3d_Unity_Bridge",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {
-        "com.unity.modules.jsonserialize": "1.0.0"
-      }
-    },
     "com.unity.ai.inference": {
       "version": "2.5.0",
       "depth": 0,
