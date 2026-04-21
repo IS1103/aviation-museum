@@ -139,9 +139,35 @@ public class SetLang : MonoBehaviour
             {
                 int idx = i + 1;
                 if (idx >= cols.Count) break;
-                _dict[columnLangs[i]][key] = cols[idx];
+                _dict[columnLangs[i]][key] = UnescapeValue(cols[idx]);
             }
         }
+    }
+
+    /// <summary>把 CSV 欄位內的 \n / \t / \\ 轉成實際字元（方便單欄位表示多行文字）。</summary>
+    private static string UnescapeValue(string raw)
+    {
+        if (string.IsNullOrEmpty(raw)) return raw;
+        if (raw.IndexOf('\\') < 0) return raw;
+
+        var sb = new StringBuilder(raw.Length);
+        for (int i = 0; i < raw.Length; i++)
+        {
+            char c = raw[i];
+            if (c == '\\' && i + 1 < raw.Length)
+            {
+                char next = raw[i + 1];
+                switch (next)
+                {
+                    case 'n': sb.Append('\n'); i++; continue;
+                    case 'r': sb.Append('\r'); i++; continue;
+                    case 't': sb.Append('\t'); i++; continue;
+                    case '\\': sb.Append('\\'); i++; continue;
+                }
+            }
+            sb.Append(c);
+        }
+        return sb.ToString();
     }
 
     /// <summary>CSV 單行解析，支援以雙引號包起來含逗號的欄位。</summary>
