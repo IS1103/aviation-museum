@@ -123,6 +123,58 @@ namespace AirMuseum
             }
         }
 
+        /// <summary>
+        /// 玩家註冊（air_museum/register）。成功回傳 RegisterResp（含新建的 player.uid），
+        /// 失敗回傳 null 並經 OnError(msg) 通知。客戶端收到後自行保存 uid，後續 Auth/SendPlayer 使用。
+        /// 注意：此 uid 為 DB 的 player.uid，與 WS 連線 token 的 uid 不同。
+        /// </summary>
+        public async Task<RegisterResp> RegisterAsync(RegisterReq payload)
+        {
+            if (_client == null)
+            {
+                EmitError("請先呼叫 ConnectAsync");
+                return null;
+            }
+            if (payload == null || string.IsNullOrWhiteSpace(payload.Name))
+            {
+                EmitError("註冊需要玩家姓名");
+                return null;
+            }
+
+            try
+            {
+                var (promise, _) = _client.Request<RegisterReq, RegisterResp>("air_museum/register", payload);
+                Debug.Log($"[AirMuseum] 註冊請求: name={payload.Name} age={payload.Age} sex={payload.Sex}");
+                var resp = await promise;
+                Debug.Log($"[AirMuseum] 註冊回應: uid={resp?.Uid}");
+                if (resp == null)
+                {
+                    EmitError("註冊無回應");
+                    return null;
+                }
+                return resp;
+            }
+            catch (TimeoutException)
+            {
+                Debug.LogWarning("[AirMuseum] 註冊逾時（未在時限內收到伺服器回應）");
+                return null;
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.Log("[AirMuseum] 註冊已取消");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                var msg = ex.Message ?? "註冊失敗";
+                if (ex.InnerException != null)
+                    msg += " (" + ex.InnerException.Message + ")";
+                Debug.LogWarning($"[AirMuseum] 註冊回應（失敗）: {msg}");
+                EmitError(msg);
+                return null;
+            }
+        }
+
         /// <summary>發送玩家操作（air_museum/player）。</summary>
         public void SendPlayer(PlayerInput payload)
         {

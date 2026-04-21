@@ -1,0 +1,5 @@
+# Minimal deps for export_glasses_onnx.py
+# (不需要 glasses-detector 整個套件，更不需要 Python 3.12)
+torch>=2.1
+torchvision>=0.16
+onnx>=1.14

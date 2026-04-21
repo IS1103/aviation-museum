@@ -44,6 +44,10 @@ namespace AirMuseum
         [Tooltip("確認按鈕：按下後把凍結的畫面輸出為 Texture2D")]
         [SerializeField] private Button confirmButton;
 
+        [Header("臉部分析（選填）")]
+        [Tooltip("按下「確認」後自動執行的臉部分析元件；null 則跳過")]
+        [SerializeField] private FaceAnalyzer faceAnalyzer;
+
         [Header("多國語言 Key（lan.csv）")]
         [Tooltip("拍照按鈕的翻譯 key（尚未拍照時顯示）")]
         [SerializeField] private string captureLangKey = "camera.btn_capture";
@@ -433,6 +437,27 @@ namespace AirMuseum
             _capturedPhoto.Apply();
 
             onPhotoConfirmed?.Invoke(_capturedPhoto);
+
+            AnalyzeFaceAndLog(_capturedPhoto);
+        }
+
+        /// <summary>呼叫 FaceAnalyzer 做推論，並把性別／年齡／眼鏡結果印到 Console。</summary>
+        private void AnalyzeFaceAndLog(Texture2D photo)
+        {
+            if (faceAnalyzer == null) return;
+
+            var r = faceAnalyzer.Analyze(photo);
+            if (!r.success)
+            {
+                Debug.LogWarning("[WebCamDisplay] 臉部分析失敗（模型未載入或輸出異常）");
+                return;
+            }
+
+            string glassesText = r.glassesAvailable
+                ? (r.wearsGlasses ? "有戴眼鏡" : "沒戴眼鏡")
+                : "未判斷（未提供眼鏡模型）";
+
+            Debug.Log($"[WebCamDisplay] 臉部分析結果 → 性別: {r.gender} | 年齡: {r.age} | 眼鏡: {glassesText}");
         }
 
         /// <summary>

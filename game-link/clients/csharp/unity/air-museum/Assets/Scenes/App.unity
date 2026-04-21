@@ -581,7 +581,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SetLang
   resourcePath: lan
-  defaultLanguage: 1
+  defaultLanguage: 0
   persist: 1
 --- !u!1 &223485619
 GameObject:
@@ -3156,6 +3156,7 @@ GameObject:
   - component: {fileID: 1383535617}
   - component: {fileID: 1383535616}
   - component: {fileID: 1383535618}
+  - component: {fileID: 1383535619}
   m_Layer: 5
   m_Name: camera
   m_TagString: Untagged
@@ -3242,12 +3243,31 @@ MonoBehaviour:
   mirrorHorizontal: 1
   captureButton: {fileID: 1922658743}
   confirmButton: {fileID: 2085923783}
+  faceAnalyzer: {fileID: 1383535619}
   captureLangKey: camera.btn_capture
   retakeLangKey: camera.btn_retake
   confirmLangKey: camera.btn_confirm
   onPhotoConfirmed:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1383535619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1383535614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80c9a5f04494eda4b9148ab4ab4017ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AirMuseum.FaceAnalyzer
+  genderAgeModel: {fileID: 5022602860645237092, guid: ed1fcfc6685ac604e8937a1850016098, type: 3}
+  glassesModel: {fileID: 5022602860645237092, guid: 3a0427ead8ad7b94497c483963aa7203, type: 3}
+  backend: 512
+  genderAgeInputSize: 96
+  glassesInputSize: 256
+  verboseLog: 0
 --- !u!1 &1430326216
 GameObject:
   m_ObjectHideFlags: 0
@@ -4106,7 +4126,7 @@ GameObject:
   - component: {fileID: 1655698989}
   - component: {fileID: 1655698988}
   m_Layer: 5
-  m_Name: cross-dressing
+  m_Name: doll
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
