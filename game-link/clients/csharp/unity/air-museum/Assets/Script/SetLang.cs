@@ -40,6 +40,26 @@ public class SetLang : MonoBehaviour
     /// <summary>目前使用的語言</summary>
     public Language CurrentLanguage => _current;
 
+    /// <summary>目前語系代碼（如 zh-Hant / en-US），供舊介面（locales 字串陣列）比對用。</summary>
+    public string CurrentLanguageCode => LanguageToCode(_current);
+
+    /// <summary>把 Language 轉成語系代碼字串（zh-Hant / en-US）。</summary>
+    public static string LanguageToCode(Language lang)
+    {
+        switch (lang)
+        {
+            case Language.EnUS: return "en-US";
+            case Language.ZhHant:
+            default: return "zh-Hant";
+        }
+    }
+
+    /// <summary>把語系代碼字串轉成 Language（預設 zh-Hant）。</summary>
+    public static Language CodeToLanguageStatic(string code)
+    {
+        return CodeToLanguage(code);
+    }
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -52,9 +72,15 @@ public class SetLang : MonoBehaviour
 
         Load();
 
+        // 同步初始化舊版 I18n（給 I18nLabel / I18nSprite 使用），否則它們會顯示 key
+        GameLink.I18n.I18n.Instance.Init();
+
         _current = persist
             ? (Language)PlayerPrefs.GetInt(PrefKey, (int)defaultLanguage)
             : defaultLanguage;
+
+        // 將當前語系同步給舊版 I18n，讓兩套系統顯示同一語言
+        GameLink.I18n.I18n.Instance.ChangeLanguage(LanguageToCode(_current));
     }
 
     private void OnDestroy()
@@ -72,6 +98,11 @@ public class SetLang : MonoBehaviour
             PlayerPrefs.SetInt(PrefKey, (int)lang);
             PlayerPrefs.Save();
         }
+
+        // 同步舊版 I18n 的語系，並強制所有 I18nLabel 重新抓翻譯
+        GameLink.I18n.I18n.Instance.ChangeLanguage(LanguageToCode(lang));
+        foreach (var lbl in FindObjectsOfType<GameLink.I18n.I18nLabel>()) lbl.Refresh();
+
         OnLanguageChanged?.Invoke(lang);
     }
 

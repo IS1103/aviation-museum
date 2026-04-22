@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Google.Protobuf;
 using Gate;
 using UnityEngine;
@@ -24,14 +24,14 @@ namespace GameLink.Libs.Client
         protected readonly List<Action<ushort, string>> CloseHandlers = new List<Action<ushort, string>>();
         protected readonly List<Action> ReconnectHandlers = new List<Action>();
         protected readonly List<Action> ReconnectFailedHandlers = new List<Action>();
-        protected readonly List<Func<Task>> BeforeReconnectHandlers = new List<Func<Task>>();
+        protected readonly List<Func<UniTask>> BeforeReconnectHandlers = new List<Func<UniTask>>();
 
         protected readonly Dictionary<uint, PendingItem> Pending = new Dictionary<uint, PendingItem>();
         protected IMainThreadRunner MainThreadRunner { get; set; }
 
         public string Url { get; set; }
         public bool IsOpen { get; set; }
-        public Task OpenPromise { get; private set; }
+        public UniTask OpenPromise { get; private set; }
         public string ConnType { get; protected set; }
         protected uint ReqIdCounter = 1;
         private readonly HashSet<string> _loggedPushErrorKeys = new HashSet<string>();
@@ -40,18 +40,29 @@ namespace GameLink.Libs.Client
         {
             Url = "";
             ConnType = "";
-            var tcs = new TaskCompletionSource<bool>();
-            OpenPromise = tcs.Task.ContinueWith(_ => { });
-            _openResolve = () => tcs.TrySetResult(true);
+            var tcs = new UniTaskCompletionSource();
+            OpenPromise = tcs.Task;
+            _openResolve = () => tcs.TrySetResult();
         }
 
         /// <summary>設定主線程派發器（如 GameLinkClientRunner）。未設定時會使用全域 GameLinkMainThreadDispatcher。</summary>
         public void SetMainThreadRunner(IMainThreadRunner runner) => MainThreadRunner = runner;
 
-        /// <summary>將 action 派發到主線程執行（使用注入的 Runner 或全域 Dispatcher）。</summary>
-        protected void DispatchToMainThread(Action a) => (MainThreadRunner ?? (IMainThreadRunner)GameLinkMainThreadDispatcher.Instance)?.Enqueue(a);
+        /// <summary>
+        /// 將 action 派發到主線程執行（使用注入的 Runner 或全域 Dispatcher）。
+        /// 若注入的 Runner 是 UnityEngine.Object 且已被銷毀（例如所在 GameObject 隨場景卸載），
+        /// 會自動 fallback 到全域 GameLinkMainThreadDispatcher，避免回應卡死。
+        /// </summary>
+        protected void DispatchToMainThread(Action a)
+        {
+            var runner = MainThreadRunner;
+            // Unity 的「假 null」：destroyed MonoBehaviour 以 == null 比較會是 true
+            if (runner is UnityEngine.Object obj && obj == null)
+                runner = null;
+            (runner ?? (IMainThreadRunner)GameLinkMainThreadDispatcher.Instance)?.Enqueue(a);
+        }
 
-        public abstract Task ConnectAsync();
+        public abstract UniTask ConnectAsync();
         public abstract void OnReceive(byte[] data);
         public abstract void Send(string route, uint reqId, byte[] normalPack, Action<Exception> reject);
 
@@ -147,7 +158,7 @@ namespace GameLink.Libs.Client
                 try { h.DynamicInvoke(dataMessage); } catch (Exception ex) { Debug.LogException(ex); }
         }
 
-        public (Task<TRes> Promise, object AbortToken) Request<TReq, TRes>(string route, TReq payload, int timeoutMs = 15000)
+        public (UniTask<TRes> Promise, object AbortToken) Request<TReq, TRes>(string route, TReq payload, int timeoutMs = 15000)
             where TReq : IMessage where TRes : IMessage
         {
             var (svt, method) = ParseRoute(route);
@@ -166,7 +177,7 @@ namespace GameLink.Libs.Client
             };
             var bin = pack.ToByteArray();
             var cts = new CancellationTokenSource();
-            var tcs = new TaskCompletionSource<TRes>();
+            var tcs = new UniTaskCompletionSource<TRes>();
             Pending[reqId] = new PendingItem
             {
                 Resolve = msg => tcs.TrySetResult((TRes)msg),
@@ -229,14 +240,14 @@ namespace GameLink.Libs.Client
             Send(route, 0, pack.ToByteArray(), _ => { });
         }
 
-        public (Task<TRes> Promise, object AbortToken) Fetch<TRes>(string route, int timeoutMs = 15000) where TRes : IMessage
+        public (UniTask<TRes> Promise, object AbortToken) Fetch<TRes>(string route, int timeoutMs = 15000) where TRes : IMessage
         {
             var (svt, method) = ParseRoute(route);
             var reqId = GetNextReqId();
             var pack = new Pack { PackType = 4, ReqId = reqId, Svt = svt, Method = method };
             var bin = pack.ToByteArray();
             var cts = new CancellationTokenSource();
-            var tcs = new TaskCompletionSource<TRes>();
+            var tcs = new UniTaskCompletionSource<TRes>();
             Pending[reqId] = new PendingItem
             {
                 Resolve = msg => tcs.TrySetResult((TRes)msg),
@@ -280,12 +291,12 @@ namespace GameLink.Libs.Client
         public void OffClose(Action<ushort, string> handler) => CloseHandlers.RemoveAll(h => (Action<ushort, string>)h == handler);
         public void OnReconnect(Action handler) => ReconnectHandlers.Add(handler);
         public void OnReconnectFailed(Action handler) => ReconnectFailedHandlers.Add(handler);
-        public void OnBeforeReconnect(Func<Task> handler) => BeforeReconnectHandlers.Add(handler);
+        public void OnBeforeReconnect(Func<UniTask> handler) => BeforeReconnectHandlers.Add(handler);
 
         protected void EmitClose(ushort code, string reason) { foreach (var h in CloseHandlers) try { h(code, reason); } catch (Exception ex) { UnityEngine.Debug.LogException(ex); } }
         protected void EmitReconnect() { foreach (var h in ReconnectHandlers) try { h(); } catch (Exception ex) { UnityEngine.Debug.LogException(ex); } }
         protected void EmitReconnectFailed() { foreach (var h in ReconnectFailedHandlers) try { h(); } catch (Exception ex) { UnityEngine.Debug.LogException(ex); } }
-        protected async Task EmitBeforeReconnect() { foreach (var h in BeforeReconnectHandlers) await h(); }
+        protected async UniTask EmitBeforeReconnect() { foreach (var h in BeforeReconnectHandlers) await h(); }
 
         public virtual void StopScan() { }
         public void AbortAll(string reason = null)
@@ -300,6 +311,6 @@ namespace GameLink.Libs.Client
 
         public uint GetNextReqId() => ReqIdCounter++;
         public virtual bool IsConnected() => IsOpen;
-        public Task WaitForConnectionAsync() => OpenPromise;
+        public UniTask WaitForConnectionAsync() => OpenPromise;
     }
 }

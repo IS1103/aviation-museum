@@ -20,7 +20,6 @@ type ServiceSection struct {
 	Svt        string `yaml:"svt"`
 	ServiceID  string `yaml:"service_id"`
 	WSPort     int    `yaml:"ws_port"`
-	HTTPPort   int    `yaml:"http_port"`   // Gin HTTP 端口（預留擴充）
 	MaxPlayers int    `yaml:"max_players"` // 單房人數上限
 }
 
@@ -94,9 +93,6 @@ func applyDefaults(c *Config) {
 	if c.Service.MaxPlayers <= 0 {
 		c.Service.MaxPlayers = 10
 	}
-	if c.Service.HTTPPort <= 0 {
-		c.Service.HTTPPort = 8771
-	}
 }
 
 // GetWSPort 取得 WebSocket 端口
@@ -134,18 +130,6 @@ func GetMaxPlayers() int {
 		return 10
 	}
 	return cfg.Service.MaxPlayers
-}
-
-// GetHTTPPort 取得 HTTP API 端口
-func GetHTTPPort() int {
-	Load()
-	if cfg == nil {
-		return 8771
-	}
-	if cfg.Service.HTTPPort <= 0 {
-		return 8771
-	}
-	return cfg.Service.HTTPPort
 }
 
 // GetPostgresDSN 取得 Postgres DSN；優先使用 YAML postgres.dsn，否則依 META_POSTGRES_*（host/port/user/password）組裝，資料庫名為 air_museum。

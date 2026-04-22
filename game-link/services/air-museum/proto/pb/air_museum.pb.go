@@ -307,113 +307,6 @@ func (x *ErrorNotify) GetMsg() string {
 	return ""
 }
 
-// 玩家註冊請求：玩家端送 request/air_museum/register，伺服器寫入 player 表後回傳 uid
-// sex 約定：0=未指定、1=男、2=女
-type RegisterReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"` // 玩家姓名（必填）
-	Age           int32                  `protobuf:"varint,2,opt,name=age,proto3" json:"age,omitempty"`  // 年齡
-	Sex           int32                  `protobuf:"varint,3,opt,name=sex,proto3" json:"sex,omitempty"`  // 性別：0 未指定 / 1 男 / 2 女
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *RegisterReq) Reset() {
-	*x = RegisterReq{}
-	mi := &file_air_museum_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RegisterReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RegisterReq) ProtoMessage() {}
-
-func (x *RegisterReq) ProtoReflect() protoreflect.Message {
-	mi := &file_air_museum_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RegisterReq.ProtoReflect.Descriptor instead.
-func (*RegisterReq) Descriptor() ([]byte, []int) {
-	return file_air_museum_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *RegisterReq) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *RegisterReq) GetAge() int32 {
-	if x != nil {
-		return x.Age
-	}
-	return 0
-}
-
-func (x *RegisterReq) GetSex() int32 {
-	if x != nil {
-		return x.Sex
-	}
-	return 0
-}
-
-// 玩家註冊回應：新建 player 列的 uid，後續流程用此 uid 關聯
-type RegisterResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Uid           uint32                 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"` // DB 自動產生的 player.uid
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *RegisterResp) Reset() {
-	*x = RegisterResp{}
-	mi := &file_air_museum_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RegisterResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RegisterResp) ProtoMessage() {}
-
-func (x *RegisterResp) ProtoReflect() protoreflect.Message {
-	mi := &file_air_museum_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RegisterResp.ProtoReflect.Descriptor instead.
-func (*RegisterResp) Descriptor() ([]byte, []int) {
-	return file_air_museum_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *RegisterResp) GetUid() uint32 {
-	if x != nil {
-		return x.Uid
-	}
-	return 0
-}
-
 var File_air_museum_proto protoreflect.FileDescriptor
 
 const file_air_museum_proto_rawDesc = "" +
@@ -430,13 +323,7 @@ const file_air_museum_proto_rawDesc = "" +
 	"\x06axis_y\x18\x04 \x01(\x02R\x05axisY\x12\x10\n" +
 	"\x03seq\x18\x05 \x01(\rR\x03seq\"\x1f\n" +
 	"\vErrorNotify\x12\x10\n" +
-	"\x03msg\x18\x01 \x01(\tR\x03msg\"E\n" +
-	"\vRegisterReq\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x10\n" +
-	"\x03age\x18\x02 \x01(\x05R\x03age\x12\x10\n" +
-	"\x03sex\x18\x03 \x01(\x05R\x03sex\" \n" +
-	"\fRegisterResp\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\rR\x03uid*V\n" +
+	"\x03msg\x18\x01 \x01(\tR\x03msg*V\n" +
 	"\x06Action\x12\x16\n" +
 	"\x12ACTION_UNSPECIFIED\x10\x00\x12\x10\n" +
 	"\fACTION_ENTRY\x10\x01\x12\x10\n" +
@@ -462,15 +349,13 @@ func file_air_museum_proto_rawDescGZIP() []byte {
 }
 
 var file_air_museum_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_air_museum_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_air_museum_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_air_museum_proto_goTypes = []any{
-	(Action)(0),          // 0: air_museum.Action
-	(GamePhase)(0),       // 1: air_museum.GamePhase
-	(*GameState)(nil),    // 2: air_museum.GameState
-	(*PlayerInput)(nil),  // 3: air_museum.PlayerInput
-	(*ErrorNotify)(nil),  // 4: air_museum.ErrorNotify
-	(*RegisterReq)(nil),  // 5: air_museum.RegisterReq
-	(*RegisterResp)(nil), // 6: air_museum.RegisterResp
+	(Action)(0),         // 0: air_museum.Action
+	(GamePhase)(0),      // 1: air_museum.GamePhase
+	(*GameState)(nil),   // 2: air_museum.GameState
+	(*PlayerInput)(nil), // 3: air_museum.PlayerInput
+	(*ErrorNotify)(nil), // 4: air_museum.ErrorNotify
 }
 var file_air_museum_proto_depIdxs = []int32{
 	1, // 0: air_museum.GameState.state:type_name -> air_museum.GamePhase
@@ -493,7 +378,7 @@ func file_air_museum_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_air_museum_proto_rawDesc), len(file_air_museum_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   5,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

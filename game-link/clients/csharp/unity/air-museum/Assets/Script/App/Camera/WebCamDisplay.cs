@@ -62,6 +62,12 @@ namespace AirMuseum
         [Tooltip("按下「確認」按鈕後觸發，參數為拍到的照片 Texture2D")]
         [SerializeField] private PhotoConfirmedEvent onPhotoConfirmed;
 
+        [Header("切換下一階段")]
+        [Tooltip("確認＋臉部分析完成後要開啟的下一個頁面根物件（通常是預設 inactive 的 Panel GameObject）")]
+        [SerializeField] private GameObject nextStageObject;
+        [Tooltip("完成後自動釋放本物件；關閉此旗標可手動控制釋放時機")]
+        [SerializeField] private bool autoReleaseAfterConfirm = true;
+
         private WebCamTexture _webCamTexture;
         private bool _started;
         private bool _isCaptured;
@@ -454,6 +460,33 @@ namespace AirMuseum
             onPhotoConfirmed?.Invoke(_capturedPhoto);
 
             AnalyzeFaceAndLog(_capturedPhoto);
+
+            if (autoReleaseAfterConfirm)
+            {
+                OpenNextStageAndRelease();
+            }
+        }
+
+        /// <summary>
+        /// 開啟下一階段頁面，並停止攝像頭、釋放本 GameObject。
+        /// - nextStageObject 會被 SetActive(true)。
+        /// - WebCamTexture 會 Stop + Destroy。
+        /// - Destroy(gameObject) 會觸發 OnDestroy 釋放 _capturedPhoto / 解除事件訂閱。
+        /// </summary>
+        public void OpenNextStageAndRelease()
+        {
+            if (nextStageObject != null)
+            {
+                nextStageObject.SetActive(true);
+            }
+            else
+            {
+                Debug.LogWarning("[WebCamDisplay] nextStageObject 未設定，僅釋放本物件。");
+            }
+
+            StopWebCam();
+
+            Destroy(gameObject);
         }
 
         /// <summary>呼叫 FaceAnalyzer 做推論，並把性別／年齡／眼鏡結果印到 Console 與 logLabel。</summary>
@@ -481,6 +514,13 @@ namespace AirMuseum
             Debug.Log($"[WebCamDisplay] 臉部分析結果 → 性別: {r.gender} | 年齡: {r.age} | 眼鏡: {glassesText}");
             if (logLabel != null)
                 logLabel.text = labelBlock;
+
+            // 存入 PlayerPrefs 方便下一頁直接讀；鍵名與 Doll.cs 對齊
+            // 若模型無法判斷眼鏡（glassesAvailable=false），一律視為「沒戴眼鏡」
+            PlayerPrefs.SetInt("air_museum_face_gender", r.gender == FaceAnalyzer.Gender.Male ? 0 : 1);
+            PlayerPrefs.SetInt("air_museum_face_age", r.age);
+            PlayerPrefs.SetInt("air_museum_face_glasses", (r.glassesAvailable && r.wearsGlasses) ? 1 : 0);
+            PlayerPrefs.Save();
         }
 
         /// <summary>

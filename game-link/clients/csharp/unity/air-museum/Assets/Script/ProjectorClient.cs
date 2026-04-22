@@ -13,11 +13,10 @@ namespace AirMuseum
         [Header("連線設定")]
         [Tooltip("服務端路徑為 /ws。若服務在 WSL、Unity 在 Windows，localhost 可能連不到，請在 WSL 執行 hostname -I 取得 IP，改填 ws://<IP>:8770/ws")]
         [SerializeField] private string wsUrl = "ws://localhost:8770/ws";
-        [Tooltip("若服務在 WSL，同上改用 WSL IP，例如 http://172.x.x.x:8771")]
-        [SerializeField] private string httpBaseUrl = "http://localhost:8771";
 
         [Header("認證（投影端用 device=projector）")]
-        [SerializeField] private string authToken = "your-jwt-or-key";
+        [Tooltip("投影端 token 不帶 key=uid，device 會指定為 projector（Server 固定 uid=1）")]
+        [SerializeField] private string authToken = "device=projector";
 
         [Header("目前遊戲階段（可透過程式或 UI 更新後呼叫 SendCurrentState）")]
         [SerializeField] private GamePhase currentPhase = GamePhase.WaitingEntry;
@@ -51,7 +50,7 @@ namespace AirMuseum
             var svc = AirMuseumService.Instance;
             var runner = GetComponent<GameLinkClientRunner>() ?? gameObject.AddComponent<GameLinkClientRunner>();
 
-            await svc.ConnectAsync(wsUrl, httpBaseUrl, runner);
+            await svc.ConnectAsync(wsUrl, runner);
             if (_destroyed) return;
             if (!svc.IsConnected)
                 return;

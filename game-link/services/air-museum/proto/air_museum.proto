@@ -5,11 +5,16 @@ option go_package = "air-museum/proto/pb;air_museum";
 option csharp_namespace = "AirMuseum";
 
 // =============================================================================
-// air-museum 設計：兩端共用 auth/validate；其餘各只用一個 WebSocket API。
+// air-museum 設計：兩端共用 auth/validate（同時承擔玩家首登註冊）；其餘各只用一個 WebSocket API。
+// - auth/validate（gate 共用路由）：
+//     * 投影端：       token = "device=projector"
+//     * 玩家續玩：     token = "key=<uid>&device=player"
+//     * 玩家首登註冊： token = "register&name=<url-encoded>&age=<n>&sex=<n>&device=player"
+//       伺服器於 auth handler 內 db.CreatePlayer 後直接 SetUID / Register，一次完成建檔+認證+綁連線。
 // - 玩家端唯一 API：notify/air_museum/player（PlayerInput：action=ENTRY|LEAVE|INPUT）
 // - 投影端唯一 API：notify/air_museum/state（GameState：state）
 // Service：連線、投影↔玩家轉發／廣播。
-// 玩家顯示資料請由各端自行處理（或另接後端）；Postgres 表 player 由服務啟動時建立（uid、session、name、age、sex、avatar_*、game_score、landing_score、ranking、creattime 等）。
+// 玩家顯示資料請由各端自行處理；Postgres 表 player 由服務啟動時建立（uid、session、name、age、sex、avatar_*、game_score、landing_score、ranking、creattime 等）。
 // =============================================================================
 
 // 玩家／投影端動作：此訊息代表什麼操作（entry、leave、input 等）
@@ -49,17 +54,4 @@ message PlayerInput {
 // 錯誤通知：Server → Client（notify/error）；client 須訂閱此事件
 message ErrorNotify {
   string msg = 1;   // 錯誤訊息，如「主機已重連，請點擊登入重新 entry」
-}
-
-// 玩家註冊請求：玩家端送 request/air_museum/register，伺服器寫入 player 表後回傳 uid
-// sex 約定：0=未指定、1=男、2=女
-message RegisterReq {
-  string name = 1;  // 玩家姓名（必填）
-  int32 age = 2;    // 年齡
-  int32 sex = 3;    // 性別：0 未指定 / 1 男 / 2 女
-}
-
-// 玩家註冊回應：新建 player 列的 uid，後續流程用此 uid 關聯
-message RegisterResp {
-  uint32 uid = 1;   // DB 自動產生的 player.uid
 }

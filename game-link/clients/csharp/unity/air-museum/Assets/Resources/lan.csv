@@ -14,3 +14,5 @@ profile.placeholder_age,請輸入您的年齡,Please enter your age
 camera.btn_capture,拍照,Take Photo
 camera.btn_retake,重拍,Retake
 camera.btn_confirm,確認,Confirm
+outfit.title,自定服飾,Customize Outfit
+outfit.btn_confirm,確認服飾,Confirm Outfit

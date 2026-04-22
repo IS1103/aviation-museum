@@ -63,6 +63,8 @@
     <Compile Include="Assets\Game\Pb\AirMuseum.cs" />
     <Compile Include="Assets\GameLink\Libs\StateMachine\TransitionMeta.cs" />
     <Compile Include="Assets\GameLink\Libs\Client\IClient.cs" />
+    <Compile Include="Assets\Script\App\Camera\FaceAnalyzer.cs" />
+    <Compile Include="Assets\Script\App\PlayerInput.cs" />
     <Compile Include="Assets\GameLink\Pb\Chat.cs" />
     <Compile Include="Assets\GameLink\Libs\StateMachine\StateMachineMessages.cs" />
     <Compile Include="Assets\GameLink\Libs\StateMachine\StateMachineFactory.cs" />
@@ -74,11 +76,11 @@
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Script\PlayerClient.cs" />
     <Compile Include="Assets\GameLink\Libs\StateMachine\StateMachineConfig.cs" />
-    <Compile Include="Assets\Script\Camera\FaceAnalyzer.cs" />
     <Compile Include="Assets\GameLink\Libs\Client\WebsocketClient.cs" />
-    <Compile Include="Assets\Script\Camera\WebCamDisplay.cs" />
+    <Compile Include="Assets\Script\App\Doll.cs" />
     <Compile Include="Assets\GameLink\Libs\Client\IWebSocketTransport.cs" />
     <Compile Include="Assets\GameLink\Libs\Client\GameLinkMainThreadDispatcher.cs" />
+    <Compile Include="Assets\Script\App\Camera\WebCamDisplay.cs" />
     <Compile Include="Assets\Script\AppLoading.cs" />
     <Compile Include="Assets\Script\ProjectorClient.cs" />
     <Compile Include="Assets\GameLink\I18n\I18n.cs" />

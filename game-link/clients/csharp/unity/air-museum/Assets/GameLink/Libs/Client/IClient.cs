@@ -1,5 +1,6 @@
 // IClient.cs - 客戶端介面定義（對應 Cocos game-link-cocos-sdk/libs/client）
 using System;
+using Cysharp.Threading.Tasks;
 using Google.Protobuf;
 
 namespace GameLink.Libs.Client
@@ -23,11 +24,11 @@ namespace GameLink.Libs.Client
 
         void Send(string route, uint reqId, byte[] normalPack, Action<Exception> reject);
 
-        (System.Threading.Tasks.Task<TRes> Promise, object AbortToken) Request<TReq, TRes>(
+        (UniTask<TRes> Promise, object AbortToken) Request<TReq, TRes>(
             string route, TReq payload, int timeoutMs = 15000)
             where TReq : IMessage where TRes : IMessage;
 
-        (System.Threading.Tasks.Task<TRes> Promise, object AbortToken) Fetch<TRes>(
+        (UniTask<TRes> Promise, object AbortToken) Fetch<TRes>(
             string route, int timeoutMs = 15000) where TRes : IMessage;
 
         void Notify<TReq>(string route, TReq payload) where TReq : IMessage;
@@ -43,12 +44,12 @@ namespace GameLink.Libs.Client
         void AbortAll(string reason = null);
         uint GetNextReqId();
 
-        System.Threading.Tasks.Task ConnectAsync();
+        UniTask ConnectAsync();
         bool IsConnected();
-        System.Threading.Tasks.Task WaitForConnectionAsync(); // 等同 await OpenPromise（連線完成）
+        UniTask WaitForConnectionAsync(); // 等同 await OpenPromise（連線完成）
 
         void OnReconnect(Action handler);
         void OnReconnectFailed(Action handler);
-        void OnBeforeReconnect(Func<System.Threading.Tasks.Task> handler);
+        void OnBeforeReconnect(Func<UniTask> handler);
     }
 }

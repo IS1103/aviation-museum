@@ -3,9 +3,11 @@ package handler
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"strconv"
 	"strings"
 
+	"air-museum/internal/db"
 	"air-museum/internal/room"
 	"internal/gateforward"
 	"internal/logger"
@@ -22,25 +24,74 @@ func init() {
 	gateforward.RegisterGateRoutes(HandleAuthValidate)
 }
 
-// parseToken 簡易解析 token：key=<uid>、device=projector|player；回傳 uid 與是否為投影端。
-func parseToken(token string) (uid uint32, isProjector bool) {
-	uid = 1
-	isProjector = false
-	for _, part := range strings.Split(token, "&") {
-		part = strings.TrimSpace(part)
-		if strings.HasPrefix(part, "key=") {
-			if n, err := strconv.ParseUint(strings.TrimPrefix(part, "key="), 10, 32); err == nil && n > 0 {
-				uid = uint32(n)
-			}
-		}
-		if strings.HasPrefix(part, "device=") {
-			isProjector = strings.TrimSpace(strings.TrimPrefix(part, "device=")) == "projector"
-		}
-	}
-	return uid, isProjector
+// parsedToken 為 parseToken 的結構化結果。
+// 續玩：IsRegister=false，uid 來自 key=<uid>（預設 1）。
+// 首登：IsRegister=true，伺服器忽略 uid，呼叫 db.CreatePlayer(Name, Age, Sex) 建檔取得新 uid。
+type parsedToken struct {
+	Uid         uint32
+	IsProjector bool
+	IsRegister  bool
+	Name        string
+	Age         int32
+	Sex         int32
 }
 
-// HandleAuthValidate 本機驗證：token 內含 key=uid、device=projector|player；投影端 auth 後 SetHost、Add(uid)。
+// parseToken 解析 token：
+//   - 續玩格式：key=<uid>&device=player
+//   - 投影端：   device=projector
+//   - 首登格式：register&name=<url-encoded>&age=<n>&sex=<n>&device=player
+//
+// 回傳的 Uid 於續玩/投影端情境下有效；首登時 Uid 由呼叫端另行建檔後覆寫。
+func parseToken(token string) parsedToken {
+	res := parsedToken{Uid: 1}
+	for _, part := range strings.Split(token, "&") {
+		part = strings.TrimSpace(part)
+		if part == "" {
+			continue
+		}
+		if part == "register" {
+			res.IsRegister = true
+			continue
+		}
+		eq := strings.IndexByte(part, '=')
+		if eq <= 0 {
+			continue
+		}
+		key := part[:eq]
+		val := part[eq+1:]
+		switch key {
+		case "key":
+			if n, err := strconv.ParseUint(val, 10, 32); err == nil && n > 0 {
+				res.Uid = uint32(n)
+			}
+		case "device":
+			res.IsProjector = strings.TrimSpace(val) == "projector"
+		case "name":
+			if decoded, err := url.QueryUnescape(val); err == nil {
+				res.Name = strings.TrimSpace(decoded)
+			} else {
+				res.Name = strings.TrimSpace(val)
+			}
+		case "age":
+			if n, err := strconv.ParseInt(val, 10, 32); err == nil {
+				res.Age = int32(n)
+			}
+		case "sex":
+			if n, err := strconv.ParseInt(val, 10, 32); err == nil {
+				res.Sex = int32(n)
+			}
+		}
+	}
+	return res
+}
+
+// HandleAuthValidate 本機驗證（整合註冊）：token 支援三種格式
+//   - 投影端：        device=projector
+//   - 玩家續玩：      key=<uid>&device=player
+//   - 玩家首登註冊：  register&name=<url-encoded>&age=<n>&sex=<n>&device=player
+//
+// 首登時於此 handler 內呼叫 db.CreatePlayer 取得新 uid，再同步完成 SetUID / Register，避免多次 round-trip。
+// 投影端通過 auth 後 SetHost、Add(uid)。
 func HandleAuthValidate(ctx ws.WSContext, req *gatepb.ValidateReq) (*gatepb.ValidateResp, error) {
 	if req == nil {
 		return nil, fmt.Errorf("req is required")
@@ -49,13 +100,30 @@ func HandleAuthValidate(ctx ws.WSContext, req *gatepb.ValidateReq) (*gatepb.Vali
 		return nil, fmt.Errorf("token is required")
 	}
 
-	uid, isProjector := parseToken(req.GetToken())
+	parsed := parseToken(req.GetToken())
+	uid := parsed.Uid
+	isProjector := parsed.IsProjector
 	// Token 內若無 device=，改以 payload 的 Device 欄位判斷（與客戶端傳入一致）
 	if d := strings.TrimSpace(strings.ToLower(req.GetDevice())); d == "projector" {
 		isProjector = true
 	} else if d == "player" {
 		isProjector = false
 	}
+
+	// 首登註冊：僅玩家端允許；投影端忽略 register 欄位，照舊固定 uid=1
+	if parsed.IsRegister && !isProjector {
+		if parsed.Name == "" {
+			return nil, fmt.Errorf("register requires name")
+		}
+		newUid, err := db.CreatePlayer(context.Background(), parsed.Name, int(parsed.Age), int(parsed.Sex))
+		if err != nil {
+			return nil, fmt.Errorf("create player: %w", err)
+		}
+		uid = newUid
+		logger.GateInfo(fmt.Sprintf("[air_museum] auth.register created uid=%d name=%s age=%d sex=%d",
+			uid, parsed.Name, parsed.Age, parsed.Sex))
+	}
+
 	// 主機端 auth 不帶 uid（投影端沒有 key=uid），由服務端固定指派；玩家端則用 token 的 key=uid，缺則預設 1
 	if isProjector {
 		uid = 1

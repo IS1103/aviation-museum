@@ -1,8 +1,10 @@
 // DefaultWebSocketTransport.cs - 使用 System.Net.WebSockets 的預設實作（WebGL 等平台請改用 NativeWebSocket 等）
+// 說明：System.Net.WebSockets 的 API 本身回傳 .NET 原生 Task，這是 BCL 的限制；
+//      本專案其餘程式碼一律改用 UniTask，這裡透過 .AsUniTask() 把 BCL Task 橋接到 UniTask。
 using System;
 using System.Net.WebSockets;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace GameLink.Libs.Client
 {
@@ -24,20 +26,20 @@ namespace GameLink.Libs.Client
             _onClose = onClose;
             _onError = onError;
             _cts = new CancellationTokenSource();
-            _ = RunAsync(url);
+            RunAsync(url).Forget();
         }
 
-        private async Task RunAsync(string url)
+        private async UniTaskVoid RunAsync(string url)
         {
             try
             {
                 _ws = new ClientWebSocket();
-                await _ws.ConnectAsync(new Uri(url), _cts.Token);
+                await _ws.ConnectAsync(new Uri(url), _cts.Token).AsUniTask();
                 _onOpen?.Invoke();
                 var buffer = new byte[1024 * 64];
                 while (_ws.State == WebSocketState.Open && !_cts.Token.IsCancellationRequested)
                 {
-                    var result = await _ws.ReceiveAsync(new ArraySegment<byte>(buffer), _cts.Token);
+                    var result = await _ws.ReceiveAsync(new ArraySegment<byte>(buffer), _cts.Token).AsUniTask();
                     if (result.MessageType == WebSocketMessageType.Close)
                     {
                         _onClose?.Invoke((ushort)result.CloseStatus.Value, result.CloseStatusDescription ?? "");
@@ -53,11 +55,9 @@ namespace GameLink.Libs.Client
             }
             catch (Exception ex)
             {
-                // 正常關閉（Close() 取消 Token）時會拋 TaskCanceledException，不當成錯誤通知
-                if (ex is OperationCanceledException || ex is TaskCanceledException)
-                    return;
-                if (ex.InnerException is OperationCanceledException || ex.InnerException is TaskCanceledException)
-                    return;
+                // 正常關閉（Close() 取消 Token）時會拋 OperationCanceledException / TaskCanceledException（後者繼承自前者），不當成錯誤通知
+                if (ex is OperationCanceledException) return;
+                if (ex.InnerException is OperationCanceledException) return;
                 _onError?.Invoke(ex);
             }
             finally
@@ -74,6 +74,7 @@ namespace GameLink.Libs.Client
         {
             if (_ws?.State != WebSocketState.Open)
                 throw new InvalidOperationException("WebSocket not open");
+            // BCL SendAsync 回傳 Task，這裡是同步 API 所以直接 GetResult 阻塞等待
             _ws.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, _cts.Token).GetAwaiter().GetResult();
         }
 

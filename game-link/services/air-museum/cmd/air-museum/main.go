@@ -3,13 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"air-museum/config"
-	"air-museum/internal/api"
 	"air-museum/internal/db"
 	"air-museum/internal/handler"
 
@@ -44,19 +42,13 @@ func main() {
 	wsServer := ws.NewServer(wsPort, wsmiddleware.LoggingMiddleware)
 	ws.ApplyRoutes(wsServer)
 
-	httpPort := config.GetHTTPPort()
-	httpAddr := fmt.Sprintf(":%d", httpPort)
-	ginRouter := api.SetupRouter()
-	httpServer := &http.Server{Addr: httpAddr, Handler: ginRouter}
-
 	logger.LogServiceInit(logger.ServiceInitConfig{
 		ServiceName: "air-museum",
 		Fields: map[string]string{
-			"svt":   config.GetSvt(),
-			"sid":   config.GetServiceID(),
-			"WS":    wsPort,
-			"HTTP":  httpAddr,
-			"mode":  "direct",
+			"svt":  config.GetSvt(),
+			"sid":  config.GetServiceID(),
+			"WS":   wsPort,
+			"mode": "direct",
 		},
 	})
 
@@ -66,15 +58,9 @@ func main() {
 	go func() {
 		wsServer.Start()
 	}()
-	go func() {
-		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.GateWarnf("HTTP server error: %v", err)
-		}
-	}()
 
 	sig := <-quit
 	logger.GateInfof("收到終止信號: %v，正在關閉服務...", sig)
-	_ = httpServer.Shutdown(context.Background())
 	logger.GateInfo("air-museum WS 已停止")
 	os.Exit(0)
 }

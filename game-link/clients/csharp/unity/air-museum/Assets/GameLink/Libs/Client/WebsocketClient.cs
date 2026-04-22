@@ -1,6 +1,6 @@
 // WebsocketClient.cs - WebSocket 客戶端（對應 Cocos WebsocketClient）
 using System;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace GameLink.Libs.Client
 {
@@ -12,7 +12,7 @@ namespace GameLink.Libs.Client
         private bool _shouldReconnect = true;
         private bool _hasConnectedOnce;
         private int _retry = MaxReconnectAttempts;
-        private TaskCompletionSource<bool> _connectTcs;
+        private UniTaskCompletionSource _connectTcs;
 
         /// <param name="url">WebSocket URL</param>
         /// <param name="transport">傳輸層實作；若為 null 則在 Connect 時自動使用 DefaultWebSocketTransport（若可用）</param>
@@ -33,12 +33,12 @@ namespace GameLink.Libs.Client
             set => _transport = value;
         }
 
-        public override async Task ConnectAsync()
+        public override async UniTask ConnectAsync()
         {
             if (_transport == null)
                 _transport = new DefaultWebSocketTransport();
 
-            _connectTcs = new TaskCompletionSource<bool>();
+            _connectTcs = new UniTaskCompletionSource();
 
             if (!_hasConnectedOnce && _retry != MaxReconnectAttempts)
                 _retry = MaxReconnectAttempts;
@@ -55,7 +55,7 @@ namespace GameLink.Libs.Client
                         IsOpen = true;
                         _openResolve?.Invoke();
                         _openResolve = null;
-                        _connectTcs.TrySetResult(true);
+                        _connectTcs.TrySetResult();
                         if (isReconnect)
                             EmitReconnect();
                     });
@@ -77,30 +77,7 @@ namespace GameLink.Libs.Client
                         if (_shouldReconnect && _retry > 0)
                         {
                             _retry--;
-                            Task.Run(async () =>
-                            {
-                                await Task.Delay(ProtoSchemaManager.RetryIntervalMs);
-                                try
-                                {
-                                    await EmitBeforeReconnect();
-                                }
-                                catch (Exception ex)
-                                {
-                                    UnityEngine.Debug.LogError($"[{ConnType}] BeforeReconnect failed: " + ex.Message);
-                                    _retry = 0;
-                                    EmitReconnectFailed();
-                                    _shouldReconnect = false;
-                                    return;
-                                }
-                                try
-                                {
-                                    await ConnectAsync();
-                                }
-                                catch (Exception ex)
-                                {
-                                    UnityEngine.Debug.LogError($"[{ConnType}] Reconnect failed: " + ex.Message);
-                                }
-                            });
+                            ReconnectLoopAsync().Forget();
                         }
                         else if (_shouldReconnect && _retry <= 0)
                         {
@@ -117,6 +94,31 @@ namespace GameLink.Libs.Client
             );
 
             await _connectTcs.Task;
+        }
+
+        private async UniTaskVoid ReconnectLoopAsync()
+        {
+            await UniTask.Delay(ProtoSchemaManager.RetryIntervalMs);
+            try
+            {
+                await EmitBeforeReconnect();
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError($"[{ConnType}] BeforeReconnect failed: " + ex.Message);
+                _retry = 0;
+                EmitReconnectFailed();
+                _shouldReconnect = false;
+                return;
+            }
+            try
+            {
+                await ConnectAsync();
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError($"[{ConnType}] Reconnect failed: " + ex.Message);
+            }
         }
 
         public override void OnReceive(byte[] data)

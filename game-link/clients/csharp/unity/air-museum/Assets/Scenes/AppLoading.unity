@@ -313,6 +313,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AppLoading
   progressSlider: {fileID: 875915109}
   nextSceneName: App
+  wsUrl: ws://localhost:8770/ws
 --- !u!1 &223485619
 GameObject:
   m_ObjectHideFlags: 0

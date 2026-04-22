@@ -17,10 +17,9 @@ namespace AirMuseum
         [Header("連線設定")]
         [Tooltip("服務端路徑為 /ws。手機與服務同網段時可用本機 IP，例如 ws://192.168.1.100:8770/ws")]
         [SerializeField] private string wsUrl = "ws://localhost:8770/ws";
-        [Tooltip("同上，HTTP 基底，例如 http://192.168.1.100:8771")]
-        [SerializeField] private string httpBaseUrl = "http://localhost:8771";
 
-        [Header("認證（玩家端用 device=player；token 可含 key=uid）")]
+        [Header("認證（玩家端用 device=player）")]
+        [Tooltip("續玩：key=<uid>&device=player；首登：register&name=<url-encoded>&age=<n>&sex=<n>&device=player")]
         [SerializeField] private string authToken = "key=1&device=player";
 
         [Header("UI（選填）")]
@@ -54,7 +53,7 @@ namespace AirMuseum
             var svc = AirMuseumService.Instance;
             var runner = GetComponent<GameLinkClientRunner>() ?? gameObject.AddComponent<GameLinkClientRunner>();
 
-            await svc.ConnectAsync(wsUrl, httpBaseUrl, runner);
+            await svc.ConnectAsync(wsUrl, runner);
             if (_destroyed) return;
             if (!svc.IsConnected)
             {
