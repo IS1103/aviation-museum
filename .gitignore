@@ -3,7 +3,10 @@ glasses-detector-1.0.4.zip
 *.zip
 
 # 超過 GitHub 100MB 限制的大型模型檔
-game-link/clients/csharp/unity/air-museum/Assets/Models/1k3d68.onnx
+game-link/clients/csharp/unity/*/Assets/Models/1k3d68.onnx
+
+# 超過 GitHub 100MB 限制的設計原檔
+doc/assets/岡山.psd
 
 # Unity iOS 匯出的 Xcode 專案（本機建置產物）
-game-link/clients/csharp/unity/air-museum/xcode/
+game-link/clients/csharp/unity/aviation-museum/xcode/
