@@ -112,7 +112,7 @@ func ensureTable(ctx context.Context) error {
 	if _, err := db.ExecContext(ctx, fmt.Sprintf(`
 		CREATE TABLE IF NOT EXISTS %s (
 			uid SERIAL PRIMARY KEY,
-			session INT NOT NULL DEFAULT 0,
+			mission INT NOT NULL DEFAULT 0,
 			name TEXT NOT NULL DEFAULT '',
 			age INT NOT NULL DEFAULT 0,
 			sex INT NOT NULL DEFAULT 0,
@@ -131,7 +131,7 @@ func ensureTable(ctx context.Context) error {
 
 	if _, err := db.ExecContext(ctx, fmt.Sprintf(`
 		CREATE TABLE IF NOT EXISTS %s (
-			session SERIAL PRIMARY KEY,
+			mission SERIAL PRIMARY KEY,
 			mission_num INT NOT NULL DEFAULT 0,
 			landing_type INT NOT NULL DEFAULT 0,
 			created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -163,7 +163,7 @@ func Close() error {
 }
 
 // CreatePlayer 新增一筆玩家資料（name/age/sex）到 player 表，回傳自動產生的 uid。
-// 其餘欄位使用 DB 預設值（avatar_*、game_score、landing_score、ranking、session 皆為 0；creattime 為 NOW()）。
+// 其餘欄位使用 DB 預設值（avatar_*、game_score、landing_score、ranking、mission 皆為 0；creattime 為 NOW()）。
 func CreatePlayer(ctx context.Context, name string, age, sex int) (uint32, error) {
 	if db == nil {
 		return 0, fmt.Errorf("db not initialized")

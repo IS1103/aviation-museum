@@ -4,7 +4,6 @@
 using Cysharp.Threading.Tasks;
 using Gate;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PlayerInput : MonoBehaviour
@@ -28,8 +27,8 @@ public class PlayerInput : MonoBehaviour
     [SerializeField] private Text statusText;
 
     [Header("流程")]
-    [Tooltip("送出成功後要切換的場景；留空代表不切")]
-    [SerializeField] private string nextSceneName = "";
+    [Tooltip("送出成功後要開啟的 GameObject（同場景內切換用）")]
+    [SerializeField] private GameObject nextGameObject;
 
     private bool _destroyed;
     private bool _subscribed;
@@ -134,14 +133,11 @@ public class PlayerInput : MonoBehaviour
 
         _submitting = false;
 
-        if (!string.IsNullOrEmpty(nextSceneName))
+        if (nextGameObject != null)
         {
-            SceneManager.LoadScene(nextSceneName);
+            nextGameObject.SetActive(true);
         }
-        else
-        {
-            SetInteractable(true);
-        }
+        gameObject.SetActive(false);
     }
 
     private void SetInteractable(bool v)

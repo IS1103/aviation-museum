@@ -1,5 +1,6 @@
 ,zh-Hant,en-US
 common.btn_confirm,確定,OK
+common.btn_back,返回,Back
 consent.title,版權與使用告示,Copyright and Usage Notice
 consent.btn_agree,同意,Agree
 copyright.title,版權與使用告示,Copyright and Usage Notice
@@ -16,3 +17,10 @@ camera.btn_retake,重拍,Retake
 camera.btn_confirm,確認,Confirm
 outfit.title,自定服飾,Customize Outfit
 outfit.btn_confirm,確認服飾,Confirm Outfit
+menu.btn_pilot_license,飛行員證,Pilot License
+menu.btn_flight_mission,飛行任務,Flight Mission
+menu.btn_record_modify,戰績改造,Record Modify
+menu.btn_flight_story,飛行故事,Flight Story
+menu.btn_logout,登出,Logout
+doodle.prompt_describe,請形容你想要的圖案,Please describe the pattern you want
+doodle.btn_generate,生成圖片,Generate Image
