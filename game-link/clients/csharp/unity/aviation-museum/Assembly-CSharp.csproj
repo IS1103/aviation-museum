@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Assets\GameLink\Libs\Client\DefaultWebSocketTransport.cs" />
     <Compile Include="Assets\GameLink\Libs\Client\IMainThreadRunner.cs" />
+    <Compile Include="Assets\Script\App\PlayerRegistrationForm.cs" />
     <Compile Include="Assets\GameLink\Pb\Gate.cs" />
     <Compile Include="Assets\Script\Role\Man.cs" />
     <Compile Include="Assets\GameLink\Libs\StateMachine\TransitionOptions.cs" />
@@ -66,7 +67,6 @@
     <Compile Include="Assets\GameLink\Libs\StateMachine\TransitionMeta.cs" />
     <Compile Include="Assets\GameLink\Libs\Client\IClient.cs" />
     <Compile Include="Assets\Script\App\Camera\FaceAnalyzer.cs" />
-    <Compile Include="Assets\Script\App\PlayerInput.cs" />
     <Compile Include="Assets\GameLink\Pb\Chat.cs" />
     <Compile Include="Assets\GameLink\Libs\StateMachine\StateMachineMessages.cs" />
     <Compile Include="Assets\Script\UISwipeRotate.cs" />
@@ -76,7 +76,6 @@
     <Compile Include="Assets\GameLink\Libs\StateMachine\IStateMachine.cs" />
     <Compile Include="Assets\GameLink\I18n\I18nLabel.cs" />
     <Compile Include="Assets\GameLink\Pb\Game.cs" />
-    <Compile Include="Assets\Script\Role\Role.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Script\AppPlayerClient.cs" />
     <Compile Include="Assets\GameLink\Libs\StateMachine\StateMachineConfig.cs" />

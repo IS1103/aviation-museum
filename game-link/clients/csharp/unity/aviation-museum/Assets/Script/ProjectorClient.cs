@@ -122,8 +122,6 @@ namespace AirMuseum
 
             var state = new GameState { State = currentPhase };
             AirMuseumService.Instance.SendState(state);
-
-            
         }
 
         /// <summary>設定階段並送出（方便從 Inspector 或程式切換）</summary>

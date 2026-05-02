@@ -1563,7 +1563,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 128d1a05802454f4fabed5052a64d8b6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerInput
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerRegistrationForm
   nameInput: {fileID: 2002394376}
   ageInput: {fileID: 1993852651}
   maleToggle: {fileID: 1877755256}

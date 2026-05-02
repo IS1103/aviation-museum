@@ -1,7 +1,8 @@
 using UnityEngine;
 
-public class Man : Role
+public class Man : MonoBehaviour
 {
+    public int hp;
     public int uid;
     public int mission;
     public string name;
@@ -97,8 +98,9 @@ public class Man : Role
         this.name = name;
         this.age = age;
         this.sex = sex;
-        this.avatarGlasses = avatarGlasses;
-        this.avatarHelmet = avatarHelmet;
+        this.gameScore = gameScore;
+        this.landingScore = landingScore;
+        this.ranking = ranking;
     }
 
     public void SetupAppearance(int avatarGlasses, int avatarHelmet, int avatarEyes, int avatarMouth)

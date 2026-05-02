@@ -79,15 +79,4 @@ public class Doll : MonoBehaviour
             $"  模型編號  → eyes={eyesIndex}, mouth={mouthIndex}, glasses={glassesIndex}, helmet={helmetIndex}"
         );
     }
-
-    private static string SexToText(int sex)
-    {
-        switch (sex)
-        {
-            case 0: return "男";
-            case 1: return "女";
-            case 2: return "非二元";
-            default: return "未選";
-        }
-    }
 }

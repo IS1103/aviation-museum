@@ -1,12 +1,11 @@
-// PlayerInput.cs - 玩家首登輸入表單（姓名／年齡／性別）→ 呼叫 auth/validate 的 register token 完成建檔+認證。
-// 注意：本類別名稱與 proto 生成的 AirMuseum.PlayerInput 同名，因此本檔不 using AirMuseum；
-//        需要 AirMuseumService 請用完整命名空間 AirMuseum.AirMuseumService 引用。
+// PlayerRegistrationForm.cs - 玩家首登表單（姓名／年齡／性別）→ register token 呼叫 auth/validate。
+// 與 protobuf 的 AirMuseum.PlayerInput 不同名，可直接使用 AirMuseum 命名空間型別而不混淆。
 using Cysharp.Threading.Tasks;
 using Gate;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerInput : MonoBehaviour
+public class PlayerRegistrationForm : MonoBehaviour
 {
     [Header("表單欄位")]
     [SerializeField] private InputField nameInput;
@@ -129,7 +128,7 @@ public class PlayerInput : MonoBehaviour
         PlayerPrefs.SetInt("air_museum_sex", sex);
         PlayerPrefs.Save();
 
-        Debug.Log($"[PlayerInput] 註冊成功 uid={newUid} name={name} age={age} sex={sex}");
+        Debug.Log($"[PlayerRegistrationForm] 註冊成功 uid={newUid} name={name} age={age} sex={sex}");
         SetStatus($"歡迎 {name}（uid={newUid}）");
 
         _submitting = false;

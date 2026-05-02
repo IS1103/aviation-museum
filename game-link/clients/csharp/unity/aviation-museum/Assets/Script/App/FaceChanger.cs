@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class FaceChanger : MonoBehaviour
@@ -25,23 +24,6 @@ public class FaceChanger : MonoBehaviour
                 faceButtons[i].onClick.AddListener(() => SetFace(index));
             }
         }
-    }
-
-    void Update()
-    {
-        // Keyboard kb = Keyboard.current;
-        // if (kb == null) return;
-
-        // if (kb.qKey.wasPressedThisFrame) SetFace(0);
-        // if (kb.wKey.wasPressedThisFrame) SetFace(1);
-        // if (kb.eKey.wasPressedThisFrame) SetFace(2);
-        // if (kb.rKey.wasPressedThisFrame) SetFace(3);
-        // if (kb.tKey.wasPressedThisFrame) SetFace(4);
-        // if (kb.yKey.wasPressedThisFrame) SetFace(5);
-        // if (kb.uKey.wasPressedThisFrame) SetFace(6);
-        // if (kb.iKey.wasPressedThisFrame) SetFace(7);
-        // if (kb.oKey.wasPressedThisFrame) SetFace(8);
-        // if (kb.pKey.wasPressedThisFrame) SetFace(9);
     }
 
     public void SetFace(int index)
