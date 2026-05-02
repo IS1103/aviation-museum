@@ -54,6 +54,7 @@ public class PlayerInput : MonoBehaviour
 
     private void Start()
     {
+        PlayerPrefs.DeleteAll();
         if (submitButton != null)
             submitButton.onClick.AddListener(OnSubmitClicked);
         SetStatus("");

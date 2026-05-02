@@ -15,6 +15,10 @@ public class Man : Role
     public int landingScore;
     public int ranking;
 
+    public FaceChanger eyesChanger;
+    public FaceChanger eyebrowChanger;
+    public FaceChanger mouthChanger;
+
     [Header("外觀物件")]
     [Tooltip("眼鏡變體：依索引只顯示其中一個，其餘關閉。-1（未戴）或索引無效時全部關閉。")]
     [SerializeField] private GameObject[] glassesObjects;
@@ -39,10 +43,12 @@ public class Man : Role
         if (idx == -1)
         {
             avatarGlasses = -1;
+            WriteGlassesPlayerPrefs();
             return;
         }
 
         glassesObjects[idx].SetActive(true);
+        WriteGlassesPlayerPrefs();
     }
 
     /// <summary>
@@ -50,15 +56,32 @@ public class Man : Role
     /// </summary>
     public void SetHelmet(int idx)
     {
-         avatarHelmet = idx;
-         
+        avatarHelmet = idx;
+
         if (helmetObjects == null || helmetObjects.Length == 0)
+        {
+            WriteHelmetPlayerPrefs();
             return;
+        }
+
+        idx = Mathf.Clamp(idx, 0, helmetObjects.Length - 1);
+        avatarHelmet = idx;
 
         for (int i = 0; i < helmetObjects.Length; i++)
             helmetObjects[i].SetActive(i == idx);
 
         helmetObjects[idx].SetActive(true);
+        WriteHelmetPlayerPrefs();
+    }
+
+    public void SetEyes(int idx){
+        eyesChanger.SetFace(idx);
+    }
+    public void SetEyebrow(int idx){
+        eyebrowChanger.SetFace(idx);
+    }
+    public void SetMouth(int idx){
+        mouthChanger.SetFace(idx);
     }
 
     // 相容舊呼叫（Doll）：開啟時顯示索引 0；關閉時全部關閉且 avatarGlasses 為 -1。
@@ -84,7 +107,30 @@ public class Man : Role
         this.avatarHelmet = avatarHelmet;
         this.avatarEyes = avatarEyes;
         this.avatarMouth = avatarMouth;
+        WriteAppearanceIndicesPlayerPrefs();
     }
 
-    
+    /// <summary>與 <see cref="Doll"/> 相同鍵：<c>air_museum_glasses_index</c>（-1 未戴，≥0 為款式索引）。</summary>
+    private void WriteGlassesPlayerPrefs()
+    {
+        PlayerPrefs.SetInt("air_museum_glasses_index", avatarGlasses);
+        PlayerPrefs.Save();
+    }
+
+    /// <summary>與 <see cref="Doll"/> 相同鍵：<c>air_museum_helmet_index</c>。</summary>
+    private void WriteHelmetPlayerPrefs()
+    {
+        PlayerPrefs.SetInt("air_museum_helmet_index", avatarHelmet);
+        PlayerPrefs.Save();
+    }
+
+    /// <summary>寫入 <see cref="Doll"/> 使用的眼／嘴／鏡／帽索引（註冊與臉部分析鍵仍由其它流程維護）。</summary>
+    private void WriteAppearanceIndicesPlayerPrefs()
+    {
+        PlayerPrefs.SetInt("air_museum_eyes_index", avatarEyes);
+        PlayerPrefs.SetInt("air_museum_mouth_index", avatarMouth);
+        PlayerPrefs.SetInt("air_museum_glasses_index", avatarGlasses);
+        PlayerPrefs.SetInt("air_museum_helmet_index", avatarHelmet);
+        PlayerPrefs.Save();
+    }
 }

@@ -8,6 +8,8 @@ public class FaceChanger : MonoBehaviour
     public int gridSize = 2;
     public Button[] faceButtons;
 
+    public int faceIndex = 0;//0:眼睛 1:眉毛 2:嘴巴
+
     private MaterialPropertyBlock block;
 
     void Start()
@@ -34,6 +36,12 @@ public class FaceChanger : MonoBehaviour
         // if (kb.wKey.wasPressedThisFrame) SetFace(1);
         // if (kb.eKey.wasPressedThisFrame) SetFace(2);
         // if (kb.rKey.wasPressedThisFrame) SetFace(3);
+        // if (kb.tKey.wasPressedThisFrame) SetFace(4);
+        // if (kb.yKey.wasPressedThisFrame) SetFace(5);
+        // if (kb.uKey.wasPressedThisFrame) SetFace(6);
+        // if (kb.iKey.wasPressedThisFrame) SetFace(7);
+        // if (kb.oKey.wasPressedThisFrame) SetFace(8);
+        // if (kb.pKey.wasPressedThisFrame) SetFace(9);
     }
 
     public void SetFace(int index)
@@ -50,10 +58,20 @@ public class FaceChanger : MonoBehaviour
         targetRenderer.GetPropertyBlock(block);
         block.SetVector("_MainTex_ST", new Vector4(scale.x, scale.y, offset.x, offset.y));
         targetRenderer.SetPropertyBlock(block);
-    }
 
-    // ✅ 新增的方法
-    void Test()
-    {
+        switch (faceIndex)
+        {
+            case 0://眼睛
+            PlayerPrefs.SetInt("air_museum_eyes_index", index);
+                break;
+            case 1://眉毛
+                PlayerPrefs.SetInt("air_museum_eyebrow_index", index);
+                break;
+            case 2://嘴巴
+                PlayerPrefs.SetInt("air_museum_mouth_index", index);
+                break;
+            default:
+                break;
+        }
     }
 }

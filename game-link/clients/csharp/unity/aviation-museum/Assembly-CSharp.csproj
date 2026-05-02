@@ -78,7 +78,7 @@
     <Compile Include="Assets\GameLink\Pb\Game.cs" />
     <Compile Include="Assets\Script\Role\Role.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
-    <Compile Include="Assets\Script\PlayerClient.cs" />
+    <Compile Include="Assets\Script\AppPlayerClient.cs" />
     <Compile Include="Assets\GameLink\Libs\StateMachine\StateMachineConfig.cs" />
     <Compile Include="Assets\GameLink\Libs\Client\WebsocketClient.cs" />
     <Compile Include="Assets\Script\App\Doll.cs" />
