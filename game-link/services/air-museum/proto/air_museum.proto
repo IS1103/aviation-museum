@@ -11,7 +11,8 @@ option csharp_namespace = "AirMuseum";
 //     * 玩家續玩：     token = "key=<uid>&device=player"
 //     * 玩家首登註冊： token = "register&name=<url-encoded>&age=<n>&sex=<n>&device=player"
 //       伺服器於 auth handler 內 db.CreatePlayer 後直接 SetUID / Register，一次完成建檔+認證+綁連線。
-// - 玩家端唯一 API：notify/air_museum/player（PlayerInput：action=ENTRY|LEAVE|INPUT）
+// - 玩家端 notify/air_museum/player（PlayerInput）：action=ENTRY|LEAVE|INPUT|SAVE_APPEARANCE
+//   SAVE_APPEARANCE：將 name/age/sex 與 avatar_* 寫入 Postgres（uid 以連線為準）
 // - 投影端唯一 API：notify/air_museum/state（GameState：state）
 // Service：連線、投影↔玩家轉發／廣播。
 // 玩家顯示資料請由各端自行處理；Postgres 表 player 由服務啟動時建立（uid、session、name、age、sex、avatar_*、game_score、landing_score、ranking、creattime 等）。
@@ -23,6 +24,7 @@ enum Action {
   ACTION_ENTRY       = 1;  // 入桌
   ACTION_LEAVE       = 2;  // 離桌
   ACTION_INPUT       = 3;  // 遊戲中輸入（axis_x/axis_y/seq 有效）
+  ACTION_SAVE_APPEARANCE = 4;  // 儲存裝扮／基本資料至 DB（填 name…avatar_helmet）
 }
 
 // 遊戲階段／狀態（可入桌／Demo／遊戲中／滿員）
@@ -49,6 +51,15 @@ message PlayerInput {
   float axis_x = 3;     // 左右，建議 -1～1（action=INPUT 時使用）
   float axis_y = 4;     // 上下，建議 -1～1（action=INPUT 時使用）
   uint32 seq = 5;       // 序號（action=INPUT 時使用）
+  // action=SAVE_APPEARANCE：客戶端填寫，與 PlayerPrefs air_museum_* 對齊；uid 仍以連線為準
+  string name = 6;
+  uint32 age = 7;
+  int32 sex = 8;             // 與客戶端註冊一致；可為 -1 未選
+  int32 avatar_eyes = 9;
+  int32 avatar_eyebrow = 10;
+  int32 avatar_mouth = 11;
+  int32 avatar_glasses = 12; // -1 表示未戴眼鏡
+  int32 avatar_helmet = 13;
 }
 
 // 錯誤通知：Server → Client（notify/error）；client 須訂閱此事件

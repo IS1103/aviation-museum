@@ -119,6 +119,7 @@ func ensureTable(ctx context.Context) error {
 			avatar_glasses INT NOT NULL DEFAULT 0,
 			avatar_helmet INT NOT NULL DEFAULT 0,
 			avatar_eyes INT NOT NULL DEFAULT 0,
+			avatar_eyebrow INT NOT NULL DEFAULT 0,
 			avatar_mouth INT NOT NULL DEFAULT 0,
 			game_score INT NOT NULL DEFAULT 0,
 			landing_score INT NOT NULL DEFAULT 0,
@@ -127,6 +128,13 @@ func ensureTable(ctx context.Context) error {
 		);
 	`, qualifiedTable(playerTable))); err != nil {
 		return fmt.Errorf("create %s: %w", playerTable, err)
+	}
+
+	if _, err := db.ExecContext(ctx, fmt.Sprintf(
+		`ALTER TABLE %s ADD COLUMN IF NOT EXISTS avatar_eyebrow INT NOT NULL DEFAULT 0`,
+		qualifiedTable(playerTable),
+	)); err != nil {
+		return fmt.Errorf("alter %s avatar_eyebrow: %w", playerTable, err)
 	}
 
 	if _, err := db.ExecContext(ctx, fmt.Sprintf(`
@@ -178,4 +186,35 @@ func CreatePlayer(ctx context.Context, name string, age, sex int) (uint32, error
 		return 0, fmt.Errorf("insert player: %w", err)
 	}
 	return uid, nil
+}
+
+// UpdatePlayerProfile 依 uid 更新玩家姓名、年齡、性別與裝扮索引（含眼鏡 -1 未戴）。
+func UpdatePlayerProfile(ctx context.Context, uid uint32, name string, age, sex, eyes, eyebrow, mouth, glasses, helmet int) error {
+	if db == nil {
+		return fmt.Errorf("db not initialized")
+	}
+	query := fmt.Sprintf(`
+		UPDATE %s SET
+			name = $2,
+			age = $3,
+			sex = $4,
+			avatar_eyes = $5,
+			avatar_eyebrow = $6,
+			avatar_mouth = $7,
+			avatar_glasses = $8,
+			avatar_helmet = $9
+		WHERE uid = $1
+	`, qualifiedTable(playerTable))
+	res, err := db.ExecContext(ctx, query, uid, name, age, sex, eyes, eyebrow, mouth, glasses, helmet)
+	if err != nil {
+		return fmt.Errorf("update player: %w", err)
+	}
+	n, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if n == 0 {
+		return fmt.Errorf("no player row for uid=%d", uid)
+	}
+	return nil
 }

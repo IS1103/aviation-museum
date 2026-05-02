@@ -26,21 +26,25 @@ namespace AirMuseum {
           string.Concat(
             "ChBhaXJfbXVzZXVtLnByb3RvEgphaXJfbXVzZXVtIj8KCUdhbWVTdGF0ZRIk",
             "CgVzdGF0ZRgBIAEoDjIVLmFpcl9tdXNldW0uR2FtZVBoYXNlEgwKBHVpZHMY",
-            "AiADKA0iawoLUGxheWVySW5wdXQSIgoGYWN0aW9uGAEgASgOMhIuYWlyX211",
-            "c2V1bS5BY3Rpb24SCwoDdWlkGAIgASgNEg4KBmF4aXNfeBgDIAEoAhIOCgZh",
-            "eGlzX3kYBCABKAISCwoDc2VxGAUgASgNIhoKC0Vycm9yTm90aWZ5EgsKA21z",
-            "ZxgBIAEoCSpWCgZBY3Rpb24SFgoSQUNUSU9OX1VOU1BFQ0lGSUVEEAASEAoM",
-            "QUNUSU9OX0VOVFJZEAESEAoMQUNUSU9OX0xFQVZFEAISEAoMQUNUSU9OX0lO",
-            "UFVUEAMqhwEKCUdhbWVQaGFzZRIaChZHQU1FX1BIQVNFX1VOU1BFQ0lGSUVE",
-            "EAASHAoYR0FNRV9QSEFTRV9XQUlUSU5HX0VOVFJZEAESEwoPR0FNRV9QSEFT",
-            "RV9ERU1PEAISFgoSR0FNRV9QSEFTRV9QTEFZSU5HEAMSEwoPR0FNRV9QSEFT",
-            "RV9GVUxMEARCLFoeYWlyLW11c2V1bS9wcm90by9wYjthaXJfbXVzZXVtqgIJ",
-            "QWlyTXVzZXVtYgZwcm90bzM="));
+            "AiADKA0ihQIKC1BsYXllcklucHV0EiIKBmFjdGlvbhgBIAEoDjISLmFpcl9t",
+            "dXNldW0uQWN0aW9uEgsKA3VpZBgCIAEoDRIOCgZheGlzX3gYAyABKAISDgoG",
+            "YXhpc195GAQgASgCEgsKA3NlcRgFIAEoDRIMCgRuYW1lGAYgASgJEgsKA2Fn",
+            "ZRgHIAEoDRILCgNzZXgYCCABKAUSEwoLYXZhdGFyX2V5ZXMYCSABKAUSFgoO",
+            "YXZhdGFyX2V5ZWJyb3cYCiABKAUSFAoMYXZhdGFyX21vdXRoGAsgASgFEhYK",
+            "DmF2YXRhcl9nbGFzc2VzGAwgASgFEhUKDWF2YXRhcl9oZWxtZXQYDSABKAUi",
+            "GgoLRXJyb3JOb3RpZnkSCwoDbXNnGAEgASgJKnIKBkFjdGlvbhIWChJBQ1RJ",
+            "T05fVU5TUEVDSUZJRUQQABIQCgxBQ1RJT05fRU5UUlkQARIQCgxBQ1RJT05f",
+            "TEVBVkUQAhIQCgxBQ1RJT05fSU5QVVQQAxIaChZBQ1RJT05fU0FWRV9BUFBF",
+            "QVJBTkNFEAQqhwEKCUdhbWVQaGFzZRIaChZHQU1FX1BIQVNFX1VOU1BFQ0lG",
+            "SUVEEAASHAoYR0FNRV9QSEFTRV9XQUlUSU5HX0VOVFJZEAESEwoPR0FNRV9Q",
+            "SEFTRV9ERU1PEAISFgoSR0FNRV9QSEFTRV9QTEFZSU5HEAMSEwoPR0FNRV9Q",
+            "SEFTRV9GVUxMEARCLFoeYWlyLW11c2V1bS9wcm90by9wYjthaXJfbXVzZXVt",
+            "qgIJQWlyTXVzZXVtYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::AirMuseum.Action), typeof(global::AirMuseum.GamePhase), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::AirMuseum.GameState), global::AirMuseum.GameState.Parser, new[]{ "State", "Uids" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::AirMuseum.PlayerInput), global::AirMuseum.PlayerInput.Parser, new[]{ "Action", "Uid", "AxisX", "AxisY", "Seq" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::AirMuseum.PlayerInput), global::AirMuseum.PlayerInput.Parser, new[]{ "Action", "Uid", "AxisX", "AxisY", "Seq", "Name", "Age", "Sex", "AvatarEyes", "AvatarEyebrow", "AvatarMouth", "AvatarGlasses", "AvatarHelmet" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::AirMuseum.ErrorNotify), global::AirMuseum.ErrorNotify.Parser, new[]{ "Msg" }, null, null, null, null)
           }));
     }
@@ -65,6 +69,10 @@ namespace AirMuseum {
     /// 遊戲中輸入（axis_x/axis_y/seq 有效）
     /// </summary>
     [pbr::OriginalName("ACTION_INPUT")] Input = 3,
+    /// <summary>
+    /// 儲存裝扮／基本資料至 DB（填 name…avatar_helmet）
+    /// </summary>
+    [pbr::OriginalName("ACTION_SAVE_APPEARANCE")] SaveAppearance = 4,
   }
 
   /// <summary>
@@ -97,6 +105,7 @@ namespace AirMuseum {
   /// 遊戲狀態：用於 pushGameState（投影端→Server）與 gameStateEvent（Server 廣播→所有玩家）
   /// 手柄端依 state 與 uids 取得房內成員列表
   /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class GameState : pb::IMessage<GameState>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
@@ -276,7 +285,11 @@ namespace AirMuseum {
     #else
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
@@ -300,7 +313,11 @@ namespace AirMuseum {
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
@@ -324,6 +341,7 @@ namespace AirMuseum {
   /// 玩家→投影端統一承載：action（entry／leave／input）、uid、輸入軸與序號（input 時使用）
   /// 玩家送時 uid 可省略，由 Server 轉發時填入；投影端依 action 決定行為
   /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class PlayerInput : pb::IMessage<PlayerInput>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
@@ -363,6 +381,14 @@ namespace AirMuseum {
       axisX_ = other.axisX_;
       axisY_ = other.axisY_;
       seq_ = other.seq_;
+      name_ = other.name_;
+      age_ = other.age_;
+      sex_ = other.sex_;
+      avatarEyes_ = other.avatarEyes_;
+      avatarEyebrow_ = other.avatarEyebrow_;
+      avatarMouth_ = other.avatarMouth_;
+      avatarGlasses_ = other.avatarGlasses_;
+      avatarHelmet_ = other.avatarHelmet_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -447,6 +473,111 @@ namespace AirMuseum {
       }
     }
 
+    /// <summary>Field number for the "name" field.</summary>
+    public const int NameFieldNumber = 6;
+    private string name_ = "";
+    /// <summary>
+    /// action=SAVE_APPEARANCE：客戶端填寫，與 PlayerPrefs air_museum_* 對齊；uid 仍以連線為準
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Name {
+      get { return name_; }
+      set {
+        name_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "age" field.</summary>
+    public const int AgeFieldNumber = 7;
+    private uint age_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Age {
+      get { return age_; }
+      set {
+        age_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "sex" field.</summary>
+    public const int SexFieldNumber = 8;
+    private int sex_;
+    /// <summary>
+    /// 與客戶端註冊一致；可為 -1 未選
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int Sex {
+      get { return sex_; }
+      set {
+        sex_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "avatar_eyes" field.</summary>
+    public const int AvatarEyesFieldNumber = 9;
+    private int avatarEyes_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int AvatarEyes {
+      get { return avatarEyes_; }
+      set {
+        avatarEyes_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "avatar_eyebrow" field.</summary>
+    public const int AvatarEyebrowFieldNumber = 10;
+    private int avatarEyebrow_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int AvatarEyebrow {
+      get { return avatarEyebrow_; }
+      set {
+        avatarEyebrow_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "avatar_mouth" field.</summary>
+    public const int AvatarMouthFieldNumber = 11;
+    private int avatarMouth_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int AvatarMouth {
+      get { return avatarMouth_; }
+      set {
+        avatarMouth_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "avatar_glasses" field.</summary>
+    public const int AvatarGlassesFieldNumber = 12;
+    private int avatarGlasses_;
+    /// <summary>
+    /// -1 表示未戴眼鏡
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int AvatarGlasses {
+      get { return avatarGlasses_; }
+      set {
+        avatarGlasses_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "avatar_helmet" field.</summary>
+    public const int AvatarHelmetFieldNumber = 13;
+    private int avatarHelmet_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int AvatarHelmet {
+      get { return avatarHelmet_; }
+      set {
+        avatarHelmet_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -467,6 +598,14 @@ namespace AirMuseum {
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(AxisX, other.AxisX)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(AxisY, other.AxisY)) return false;
       if (Seq != other.Seq) return false;
+      if (Name != other.Name) return false;
+      if (Age != other.Age) return false;
+      if (Sex != other.Sex) return false;
+      if (AvatarEyes != other.AvatarEyes) return false;
+      if (AvatarEyebrow != other.AvatarEyebrow) return false;
+      if (AvatarMouth != other.AvatarMouth) return false;
+      if (AvatarGlasses != other.AvatarGlasses) return false;
+      if (AvatarHelmet != other.AvatarHelmet) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -479,6 +618,14 @@ namespace AirMuseum {
       if (AxisX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(AxisX);
       if (AxisY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(AxisY);
       if (Seq != 0) hash ^= Seq.GetHashCode();
+      if (Name.Length != 0) hash ^= Name.GetHashCode();
+      if (Age != 0) hash ^= Age.GetHashCode();
+      if (Sex != 0) hash ^= Sex.GetHashCode();
+      if (AvatarEyes != 0) hash ^= AvatarEyes.GetHashCode();
+      if (AvatarEyebrow != 0) hash ^= AvatarEyebrow.GetHashCode();
+      if (AvatarMouth != 0) hash ^= AvatarMouth.GetHashCode();
+      if (AvatarGlasses != 0) hash ^= AvatarGlasses.GetHashCode();
+      if (AvatarHelmet != 0) hash ^= AvatarHelmet.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -517,6 +664,38 @@ namespace AirMuseum {
         output.WriteRawTag(40);
         output.WriteUInt32(Seq);
       }
+      if (Name.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(Name);
+      }
+      if (Age != 0) {
+        output.WriteRawTag(56);
+        output.WriteUInt32(Age);
+      }
+      if (Sex != 0) {
+        output.WriteRawTag(64);
+        output.WriteInt32(Sex);
+      }
+      if (AvatarEyes != 0) {
+        output.WriteRawTag(72);
+        output.WriteInt32(AvatarEyes);
+      }
+      if (AvatarEyebrow != 0) {
+        output.WriteRawTag(80);
+        output.WriteInt32(AvatarEyebrow);
+      }
+      if (AvatarMouth != 0) {
+        output.WriteRawTag(88);
+        output.WriteInt32(AvatarMouth);
+      }
+      if (AvatarGlasses != 0) {
+        output.WriteRawTag(96);
+        output.WriteInt32(AvatarGlasses);
+      }
+      if (AvatarHelmet != 0) {
+        output.WriteRawTag(104);
+        output.WriteInt32(AvatarHelmet);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -547,6 +726,38 @@ namespace AirMuseum {
         output.WriteRawTag(40);
         output.WriteUInt32(Seq);
       }
+      if (Name.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(Name);
+      }
+      if (Age != 0) {
+        output.WriteRawTag(56);
+        output.WriteUInt32(Age);
+      }
+      if (Sex != 0) {
+        output.WriteRawTag(64);
+        output.WriteInt32(Sex);
+      }
+      if (AvatarEyes != 0) {
+        output.WriteRawTag(72);
+        output.WriteInt32(AvatarEyes);
+      }
+      if (AvatarEyebrow != 0) {
+        output.WriteRawTag(80);
+        output.WriteInt32(AvatarEyebrow);
+      }
+      if (AvatarMouth != 0) {
+        output.WriteRawTag(88);
+        output.WriteInt32(AvatarMouth);
+      }
+      if (AvatarGlasses != 0) {
+        output.WriteRawTag(96);
+        output.WriteInt32(AvatarGlasses);
+      }
+      if (AvatarHelmet != 0) {
+        output.WriteRawTag(104);
+        output.WriteInt32(AvatarHelmet);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -571,6 +782,30 @@ namespace AirMuseum {
       }
       if (Seq != 0) {
         size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Seq);
+      }
+      if (Name.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
+      }
+      if (Age != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Age);
+      }
+      if (Sex != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Sex);
+      }
+      if (AvatarEyes != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(AvatarEyes);
+      }
+      if (AvatarEyebrow != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(AvatarEyebrow);
+      }
+      if (AvatarMouth != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(AvatarMouth);
+      }
+      if (AvatarGlasses != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(AvatarGlasses);
+      }
+      if (AvatarHelmet != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(AvatarHelmet);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -599,6 +834,30 @@ namespace AirMuseum {
       if (other.Seq != 0) {
         Seq = other.Seq;
       }
+      if (other.Name.Length != 0) {
+        Name = other.Name;
+      }
+      if (other.Age != 0) {
+        Age = other.Age;
+      }
+      if (other.Sex != 0) {
+        Sex = other.Sex;
+      }
+      if (other.AvatarEyes != 0) {
+        AvatarEyes = other.AvatarEyes;
+      }
+      if (other.AvatarEyebrow != 0) {
+        AvatarEyebrow = other.AvatarEyebrow;
+      }
+      if (other.AvatarMouth != 0) {
+        AvatarMouth = other.AvatarMouth;
+      }
+      if (other.AvatarGlasses != 0) {
+        AvatarGlasses = other.AvatarGlasses;
+      }
+      if (other.AvatarHelmet != 0) {
+        AvatarHelmet = other.AvatarHelmet;
+      }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -610,7 +869,11 @@ namespace AirMuseum {
     #else
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
@@ -634,6 +897,38 @@ namespace AirMuseum {
             Seq = input.ReadUInt32();
             break;
           }
+          case 50: {
+            Name = input.ReadString();
+            break;
+          }
+          case 56: {
+            Age = input.ReadUInt32();
+            break;
+          }
+          case 64: {
+            Sex = input.ReadInt32();
+            break;
+          }
+          case 72: {
+            AvatarEyes = input.ReadInt32();
+            break;
+          }
+          case 80: {
+            AvatarEyebrow = input.ReadInt32();
+            break;
+          }
+          case 88: {
+            AvatarMouth = input.ReadInt32();
+            break;
+          }
+          case 96: {
+            AvatarGlasses = input.ReadInt32();
+            break;
+          }
+          case 104: {
+            AvatarHelmet = input.ReadInt32();
+            break;
+          }
         }
       }
     #endif
@@ -645,7 +940,11 @@ namespace AirMuseum {
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
@@ -669,6 +968,38 @@ namespace AirMuseum {
             Seq = input.ReadUInt32();
             break;
           }
+          case 50: {
+            Name = input.ReadString();
+            break;
+          }
+          case 56: {
+            Age = input.ReadUInt32();
+            break;
+          }
+          case 64: {
+            Sex = input.ReadInt32();
+            break;
+          }
+          case 72: {
+            AvatarEyes = input.ReadInt32();
+            break;
+          }
+          case 80: {
+            AvatarEyebrow = input.ReadInt32();
+            break;
+          }
+          case 88: {
+            AvatarMouth = input.ReadInt32();
+            break;
+          }
+          case 96: {
+            AvatarGlasses = input.ReadInt32();
+            break;
+          }
+          case 104: {
+            AvatarHelmet = input.ReadInt32();
+            break;
+          }
         }
       }
     }
@@ -679,6 +1010,7 @@ namespace AirMuseum {
   /// <summary>
   /// 錯誤通知：Server → Client（notify/error）；client 須訂閱此事件
   /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class ErrorNotify : pb::IMessage<ErrorNotify>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
@@ -837,7 +1169,11 @@ namespace AirMuseum {
     #else
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
@@ -856,7 +1192,11 @@ namespace AirMuseum {
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;

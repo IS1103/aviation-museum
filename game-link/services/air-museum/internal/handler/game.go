@@ -3,7 +3,9 @@ package handler
 import (
 	"context"
 	"fmt"
+	"strings"
 
+	"air-museum/internal/db"
 	"air-museum/internal/room"
 	pb "air-museum/proto/pb"
 	forward "internal/grpc/forward"
@@ -45,6 +47,24 @@ func playerNotify(ctx context.Context, uid uint32, req *pb.PlayerInput) error {
 			return nil
 		}
 		sendPlayerToHost(ctx, r, pb.Action_ACTION_INPUT, uid, req.GetAxisX(), req.GetAxisY(), req.GetSeq())
+	case pb.Action_ACTION_SAVE_APPEARANCE:
+		name := strings.TrimSpace(req.GetName())
+		age := int(req.GetAge())
+		if age < 0 {
+			age = 0
+		}
+		if age > 150 {
+			age = 150
+		}
+		sex := int(req.GetSex())
+		err := db.UpdatePlayerProfile(ctx, uid, name, age, sex,
+			int(req.GetAvatarEyes()), int(req.GetAvatarEyebrow()), int(req.GetAvatarMouth()),
+			int(req.GetAvatarGlasses()), int(req.GetAvatarHelmet()))
+		if err != nil {
+			logger.GateWarnf("[air_museum] SAVE_APPEARANCE uid=%d: %v", uid, err)
+			return err
+		}
+		logger.GateInfo(fmt.Sprintf("[air_museum] uid=%d saved profile to db", uid))
 	default:
 		// ACTION_UNSPECIFIED 等忽略
 	}

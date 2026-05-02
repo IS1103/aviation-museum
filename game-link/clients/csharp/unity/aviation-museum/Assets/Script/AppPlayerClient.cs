@@ -147,21 +147,41 @@ namespace AirMuseum
         public uint MyUid => _myUid;
 
         /// <summary>
-        /// 自 PlayerPrefs（<c>air_museum_*</c>）取得註冊資料與眼／嘴／鏡／帽索引。
+        /// 自 PlayerPrefs（<c>air_museum_*</c>）記錄目前註冊／裝扮，並以 <c>air_museum/player</c> 寫回伺服器 DB。
         /// </summary>
         public void ConfirmClothing()
         {
+            int ageInt = Mathf.Clamp(PlayerPrefs.GetInt("air_museum_age", 0), 0, 150);
             Debug.Log(
                 "【確認裝扮】PlayerPrefs\n" +
                 "使用者 ID： " + PlayerPrefs.GetInt("air_museum_uid", 0) + "\n" +
                 "姓名： " + PlayerPrefs.GetString("air_museum_name", "") + "\n" +
-                "年齡： " + PlayerPrefs.GetInt("air_museum_age", 0) + "\n" +
+                "年齡： " + ageInt + "\n" +
                 "性別： " + PlayerPrefs.GetInt("air_museum_sex", -1) + "\n" +
                 "眼睛索引： " + PlayerPrefs.GetInt("air_museum_eyes_index", 0) + "\n" +
                 "眉毛索引： " + PlayerPrefs.GetInt("air_museum_eyebrow_index", 0) + "\n" +
                 "嘴巴索引： " + PlayerPrefs.GetInt("air_museum_mouth_index", 0) + "\n" +
                 "眼鏡索引： " + PlayerPrefs.GetInt("air_museum_glasses_index", -1) + "\n" +
                 "頭盔索引： " + PlayerPrefs.GetInt("air_museum_helmet_index", 0));
+
+            if (!AirMuseumService.Instance.IsConnected)
+            {
+                Debug.LogWarning("[手機端] 確認裝扮：未連線，略過同步伺服器");
+                return;
+            }
+
+            AirMuseumService.Instance.SendPlayer(new PlayerInput
+            {
+                Action = Action.SaveAppearance,
+                Name = PlayerPrefs.GetString("air_museum_name", ""),
+                Age = (uint)ageInt,
+                Sex = PlayerPrefs.GetInt("air_museum_sex", -1),
+                AvatarEyes = PlayerPrefs.GetInt("air_museum_eyes_index", 0),
+                AvatarEyebrow = PlayerPrefs.GetInt("air_museum_eyebrow_index", 0),
+                AvatarMouth = PlayerPrefs.GetInt("air_museum_mouth_index", 0),
+                AvatarGlasses = PlayerPrefs.GetInt("air_museum_glasses_index", -1),
+                AvatarHelmet = PlayerPrefs.GetInt("air_museum_helmet_index", 0),
+            });
         }
     }
 }
