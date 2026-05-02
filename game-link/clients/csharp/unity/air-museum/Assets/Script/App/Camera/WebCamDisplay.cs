@@ -519,7 +519,7 @@ namespace AirMuseum
             // 若模型無法判斷眼鏡（glassesAvailable=false），一律視為「沒戴眼鏡」
             PlayerPrefs.SetInt("air_museum_face_gender", r.gender == FaceAnalyzer.Gender.Male ? 0 : 1);
             PlayerPrefs.SetInt("air_museum_face_age", r.age);
-            PlayerPrefs.SetInt("air_museum_face_glasses", (r.glassesAvailable && r.wearsGlasses) ? 1 : 0);
+            PlayerPrefs.SetInt("air_museum_face_glasses_num", (r.glassesAvailable && r.wearsGlasses) ? 0 : -1);
             PlayerPrefs.Save();
         }
 

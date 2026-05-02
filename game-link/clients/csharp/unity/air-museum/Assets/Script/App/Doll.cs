@@ -16,11 +16,11 @@ public class Doll : MonoBehaviour
 
         int faceGenderRaw = PlayerPrefs.GetInt("air_museum_face_gender", -1);
         int faceAge = PlayerPrefs.GetInt("air_museum_face_age", -1);
-        int glasses = PlayerPrefs.GetInt("air_museum_face_glasses", 0);
+        int glasses = PlayerPrefs.GetInt("air_museum_face_glasses_num", -1);
 
         string sexText = SexToText(sex);
         string faceGenderText = faceGenderRaw == 0 ? "Male" : faceGenderRaw == 1 ? "Female" : "未知";
-        string glassesText = glasses == 1 ? "有戴眼鏡" : "沒戴眼鏡";
+        string glassesText = glasses == 0 ? "有戴眼鏡" : "沒戴眼鏡";
 
         Debug.Log(
             "[Doll] PlayerPrefs 狀態：\n" +

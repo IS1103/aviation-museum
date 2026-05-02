@@ -1,0 +1,20 @@
+多人連線雙熒幕遊戲主機
+CPU：Ryzen 9 7900
+GPU：RTX 4070 12GB（3螢幕就要升到16GB）
+RAM：64GB
+SSD：2TB NVMe
+功能：client+server+後台
+
+另外飛機的塗鴉墻可以考慮再一台，或者螢幕接到上述的主機（但資源會比較吃緊，可以先測試三台螢幕接一台主機進行測試，如果不夠再採購第二台）：
+CPU：Ryzen 5 7600
+GPU：RTX 3060 12GB
+RAM：32GB
+SSD：1TB NVMe
+功能：client
+
+因為塗鴉墻是在每個人的手機上呼叫生圖，所以顯卡要能平行支援平行生成，建議配置如下：
+CPU：Ryzen 9 7900
+GPU：RTX 4090（24GB）
+RAM：64GB（建議128GB）
+SSD：2TB NVMe
+功能：ai text-to-image （極速生圖ai模型參考：LCM、sdxl-turbo）
