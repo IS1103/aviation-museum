@@ -5,8 +5,6 @@ public class Dressing : MonoBehaviour
 {
     [SerializeField] private Toggle[] toggles;
     [SerializeField] private GameObject[] targets;
-    [SerializeField] private Button confirmButton;
-    [SerializeField] private GameObject nextWindow;
 
     private void Start()
     {
@@ -17,10 +15,10 @@ public class Dressing : MonoBehaviour
             toggles[i].onValueChanged.AddListener(isOn => OnToggleChanged(idx, isOn));
         }
 
-        if (confirmButton != null)
-        {
-            confirmButton.onClick.AddListener(OnConfirmClicked);
-        }
+        // if (confirmButton != null)
+        // {
+        //     confirmButton.onClick.AddListener(OnConfirmClicked);
+        // }
 
         ApplyCurrentSelection();
     }
@@ -36,19 +34,10 @@ public class Dressing : MonoBehaviour
             }
         }
 
-        if (confirmButton != null)
-        {
-            confirmButton.onClick.RemoveListener(OnConfirmClicked);
-        }
-    }
-
-    private void OnConfirmClicked()
-    {
-        if (nextWindow != null)
-        {
-            nextWindow.SetActive(true);
-        }
-        gameObject.SetActive(false);
+        // if (confirmButton != null)
+        // {
+        //     confirmButton.onClick.RemoveListener(OnConfirmClicked);
+        // }
     }
 
     private void OnToggleChanged(int idx, bool isOn)

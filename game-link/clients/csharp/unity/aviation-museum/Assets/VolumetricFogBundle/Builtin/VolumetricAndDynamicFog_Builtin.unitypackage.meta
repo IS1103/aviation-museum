@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: eebef07bd4ae74e6981505b540da4731
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 162694
+  packageName: Volumetric Fog & Mist 2
+  packageVersion: 31.1.1
+  assetPath: Assets/VolumetricFogBundle/Builtin/VolumetricAndDynamicFog_Builtin.unitypackage
+  uploadId: 896462

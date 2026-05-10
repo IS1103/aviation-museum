@@ -1,6 +1,6 @@
 // AirMuseumService.cs - 航空館連線與 API 單例
 // 使用方式：ConnectAsync(wsUrl)；錯誤統一經 OnError(msg)；事件僅支援 +=。
-// 首登註冊請使用 BuildRegisterToken(name, age, sex, "player") 組 token 後呼叫 AuthAsync。
+// auth/validate 以 ValidateReq.Device 區分終端（見 doc）；選填 token 僅 uid= 續連或 register&…。
 using System;
 using Cysharp.Threading.Tasks;
 using Gate;
@@ -27,6 +27,9 @@ namespace AirMuseum
 
         /// <summary>收到 Server 推送的 GameState（air_museum/state）</summary>
         public event Action<GameState> OnState;
+
+        /// <summary>收到 notify air_museum/add_player（推送玩家資料，例如手機端 SAVE_APPEARANCE 後）</summary>
+        public event Action<AddPlayerNotify> OnAddPlayer;
 
         /// <summary>任何錯誤（連線、認證、WS 錯誤推送）僅傳錯誤訊息字串</summary>
         public event Action<string> OnError;
@@ -74,6 +77,7 @@ namespace AirMuseum
 
             _client.OnNotify<PlayerInput>("air_museum/player", p => OnPlayer?.Invoke(p));
             _client.OnNotify<GameState>("air_museum/state", s => OnState?.Invoke(s));
+            _client.OnNotify<AddPlayerNotify>("air_museum/add_player", p => OnAddPlayer?.Invoke(p));
             _client.OnNotify<ErrorNotify>("air_museum/error", e => OnError?.Invoke(e.Msg ?? ""));
             _client.OnNotifyErr((route, msg) => OnError?.Invoke(msg ?? ""));
         }
@@ -125,22 +129,18 @@ namespace AirMuseum
         }
 
         /// <summary>
-        /// 組 auth/validate 的首登註冊 token：register&name=<url-encoded>&age=<n>&sex=<n>&device=<device>
-        /// 伺服器會 db.CreatePlayer 取得新 uid 並完成連線綁定，ValidateResp.Uid 即為新的 player.uid。
-        /// sex 約定：0=未指定 / 1=男 / 2=女；device 通常為 "player"（首登不走 projector）。
+        /// 組 auth/validate 的註冊 token：register&name=…&age=…&sex=…（與 ValidateReq.Device 併用，勿在 token 內帶 device）。
         /// </summary>
-        public static string BuildRegisterToken(string name, int age, int sex, string device = "player")
+        public static string BuildRegisterToken(string name, int age, int sex)
         {
             var n = string.IsNullOrEmpty(name) ? "" : UnityEngine.Networking.UnityWebRequest.EscapeURL(name);
-            return $"register&name={n}&age={age}&sex={sex}&device={device}";
+            return $"register&name={n}&age={age}&sex={sex}";
         }
 
-        /// <summary>
-        /// 組 auth/validate 的續玩 token：key=<uid>&device=<device>
-        /// </summary>
-        public static string BuildLoginToken(uint uid, string device = "player")
+        /// <summary>續連 token：僅 uid=&lt;n&gt;（身分一律由 ValidateReq.Device 指定）。</summary>
+        public static string BuildResumeToken(uint uid)
         {
-            return $"key={uid}&device={device}";
+            return $"uid={uid}";
         }
 
         /// <summary>發送玩家操作（air_museum/player）。</summary>

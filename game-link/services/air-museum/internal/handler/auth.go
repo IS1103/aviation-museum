@@ -24,26 +24,36 @@ func init() {
 	gateforward.RegisterGateRoutes(HandleAuthValidate)
 }
 
-// parsedToken 為 parseToken 的結構化結果。
-// 續玩：IsRegister=false，uid 來自 key=<uid>（預設 1）。
-// 首登：IsRegister=true，伺服器忽略 uid，呼叫 db.CreatePlayer(Name, Age, Sex) 建檔取得新 uid。
-type parsedToken struct {
-	Uid         uint32
-	IsProjector bool
-	IsRegister  bool
-	Name        string
-	Age         int32
-	Sex         int32
+func normDevice(s string) string {
+	return strings.TrimSpace(strings.ToLower(s))
 }
 
-// parseToken 解析 token：
-//   - 續玩格式：key=<uid>&device=player
-//   - 投影端：   device=projector
-//   - 首登格式：register&name=<url-encoded>&age=<n>&sex=<n>&device=player
-//
-// 回傳的 Uid 於續玩/投影端情境下有效；首登時 Uid 由呼叫端另行建檔後覆寫。
+// isHostDevice：遊戲主畫面（投影幕），連線為 player 種子 uid=1、入房為 host。
+func isHostDevice(device string) bool {
+	d := normDevice(device)
+	return d == "gamescreen" || d == "projector" // projector 僅相容舊客戶端
+}
+
+func isPlayerDevice(device string) bool {
+	return normDevice(device) == "player"
+}
+
+func isKnownAirMuseumDevice(device string) bool {
+	return db.IsFixtureDevice(normDevice(device)) || isPlayerDevice(device)
+}
+
+// parsedToken 僅解析 token 字串（不含 ValidateReq.device；device 一律以欄位為準）。
+// 選填：uid=<n> 續連；register&name=… 相容舊版首登。
+type parsedToken struct {
+	Uid        uint32
+	IsRegister bool
+	Name       string
+	Age        int32
+	Sex        int32
+}
+
 func parseToken(token string) parsedToken {
-	res := parsedToken{Uid: 1}
+	res := parsedToken{}
 	for _, part := range strings.Split(token, "&") {
 		part = strings.TrimSpace(part)
 		if part == "" {
@@ -60,12 +70,10 @@ func parseToken(token string) parsedToken {
 		key := part[:eq]
 		val := part[eq+1:]
 		switch key {
-		case "key":
+		case "uid":
 			if n, err := strconv.ParseUint(val, 10, 32); err == nil && n > 0 {
 				res.Uid = uint32(n)
 			}
-		case "device":
-			res.IsProjector = strings.TrimSpace(val) == "projector"
 		case "name":
 			if decoded, err := url.QueryUnescape(val); err == nil {
 				res.Name = strings.TrimSpace(decoded)
@@ -85,53 +93,78 @@ func parseToken(token string) parsedToken {
 	return res
 }
 
-// HandleAuthValidate 本機驗證（整合註冊）：token 支援三種格式
-//   - 投影端：        device=projector
-//   - 玩家續玩：      key=<uid>&device=player
-//   - 玩家首登註冊：  register&name=<url-encoded>&age=<n>&sex=<n>&device=player
-//
-// 首登時於此 handler 內呼叫 db.CreatePlayer 取得新 uid，再同步完成 SetUID / Register，避免多次 round-trip。
-// 投影端通過 auth 後 SetHost、Add(uid)。
+// HandleAuthValidate：認證依 ValidateReq.device。固定終端從 DB 種子列取 uid 並綁定；device=player 走 CreatePlayer／續連。
 func HandleAuthValidate(ctx ws.WSContext, req *gatepb.ValidateReq) (*gatepb.ValidateResp, error) {
 	if req == nil {
 		return nil, fmt.Errorf("req is required")
 	}
-	if req.GetToken() == "" {
-		return nil, fmt.Errorf("token is required")
+
+	deviceRaw := strings.TrimSpace(req.GetDevice())
+	if deviceRaw == "" {
+		return nil, fmt.Errorf("device is required")
+	}
+	if !isKnownAirMuseumDevice(deviceRaw) {
+		return nil, fmt.Errorf("unknown device %q", deviceRaw)
 	}
 
-	parsed := parseToken(req.GetToken())
-	uid := parsed.Uid
-	isProjector := parsed.IsProjector
-	// Token 內若無 device=，改以 payload 的 Device 欄位判斷（與客戶端傳入一致）
-	if d := strings.TrimSpace(strings.ToLower(req.GetDevice())); d == "projector" {
-		isProjector = true
-	} else if d == "player" {
-		isProjector = false
-	}
+	nd := normDevice(deviceRaw)
 
-	// 首登註冊：僅玩家端允許；投影端忽略 register 欄位，照舊固定 uid=1
-	if parsed.IsRegister && !isProjector {
-		if parsed.Name == "" {
-			return nil, fmt.Errorf("register requires name")
-		}
-		newUid, err := db.CreatePlayer(context.Background(), parsed.Name, int(parsed.Age), int(parsed.Sex))
+	var uid uint32
+
+	if db.IsFixtureDevice(nd) {
+		var err error
+		uid, err = db.GetFixtureAuthUID(context.Background(), nd)
 		if err != nil {
-			return nil, fmt.Errorf("create player: %w", err)
+			return nil, err
 		}
-		uid = newUid
-		logger.GateInfo(fmt.Sprintf("[air_museum] auth.register created uid=%d name=%s age=%d sex=%d",
-			uid, parsed.Name, parsed.Age, parsed.Sex))
+	} else if isPlayerDevice(deviceRaw) {
+		tokenStr := strings.TrimSpace(req.GetToken())
+		var parsed parsedToken
+		if tokenStr != "" {
+			parsed = parseToken(tokenStr)
+		}
+
+		if parsed.IsRegister {
+			if parsed.Name == "" {
+				return nil, fmt.Errorf("register requires name")
+			}
+			newUid, err := db.CreatePlayer(context.Background(), parsed.Name, int(parsed.Age), int(parsed.Sex))
+			if err != nil {
+				return nil, fmt.Errorf("create player: %w", err)
+			}
+			uid = newUid
+			logger.GateInfo(fmt.Sprintf("[air_museum] auth.register created uid=%d name=%s age=%d sex=%d",
+				uid, parsed.Name, parsed.Age, parsed.Sex))
+		} else if parsed.Uid > 0 {
+			if db.IsReservedFixtureUID(parsed.Uid) {
+				return nil, fmt.Errorf("uid %d reserved for fixtures, cannot use as player token", parsed.Uid)
+			}
+			exists, err := db.PlayerExists(context.Background(), parsed.Uid)
+			if err != nil {
+				return nil, err
+			}
+			if exists {
+				uid = parsed.Uid
+			} else {
+				newUid, err := db.CreatePlayer(context.Background(), "", 0, 0)
+				if err != nil {
+					return nil, fmt.Errorf("create player: %w", err)
+				}
+				uid = newUid
+				logger.GateInfo(fmt.Sprintf("[air_museum] auth uid=%d not in db, issued new uid=%d", parsed.Uid, uid))
+			}
+		} else {
+			newUid, err := db.CreatePlayer(context.Background(), "", 0, 0)
+			if err != nil {
+				return nil, fmt.Errorf("create player: %w", err)
+			}
+			uid = newUid
+			logger.GateInfo(fmt.Sprintf("[air_museum] auth new session player uid=%d", uid))
+		}
+	} else {
+		return nil, fmt.Errorf("unknown device %q", deviceRaw)
 	}
 
-	// 主機端 auth 不帶 uid（投影端沒有 key=uid），由服務端固定指派；玩家端則用 token 的 key=uid，缺則預設 1
-	if isProjector {
-		uid = 1
-	} else if uid == 0 {
-		uid = 1
-	}
-
-	// 同機重複登入：本機踢舊連線（直連無 Redis push）
 	cm := conn.GetConnectionManager()
 	if oldConn, hasOld := cm.GetConnection(uid); hasOld && oldConn != nil {
 		_ = cm.HandleDuplicateLogin(context.Background(), uid, nil)
@@ -139,10 +172,10 @@ func HandleAuthValidate(ctx ws.WSContext, req *gatepb.ValidateReq) (*gatepb.Vali
 
 	ctx.SetUID(uid)
 	cm.Register(uid, ws.GetWSConn(ctx))
+	logger.GateInfo(fmt.Sprintf("[air_museum] 連線：uid=%d（device=%s）", uid, deviceRaw))
 
-	if isProjector {
+	if isHostDevice(deviceRaw) {
 		r := room.Get()
-		// 主機重連：只踢房內玩家，送 error 後關閉連線，讓玩家重新 entry
 		hostUid := uid
 		for _, u := range r.UIDs() {
 			if u == hostUid {
@@ -159,6 +192,5 @@ func HandleAuthValidate(ctx ws.WSContext, req *gatepb.ValidateReq) (*gatepb.Vali
 		_ = r.Add(uid)
 	}
 
-	logger.GateInfo(fmt.Sprintf("[%d] auth.validate success (local), projector=%v, online: %d", uid, isProjector, cm.GetOnlineCount()))
 	return &gatepb.ValidateResp{Uid: uid}, nil
 }

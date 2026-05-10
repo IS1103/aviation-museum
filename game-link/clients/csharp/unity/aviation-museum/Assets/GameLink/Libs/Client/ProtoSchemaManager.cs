@@ -41,6 +41,7 @@ namespace GameLink.Libs.Client
             Register(AirMuseum.GameState.Descriptor.FullName, bs => AirMuseum.GameState.Parser.ParseFrom(bs));
             Register(AirMuseum.PlayerInput.Descriptor.FullName, bs => AirMuseum.PlayerInput.Parser.ParseFrom(bs));
             Register(AirMuseum.ErrorNotify.Descriptor.FullName, bs => AirMuseum.ErrorNotify.Parser.ParseFrom(bs));
+            Register(AirMuseum.AddPlayerNotify.Descriptor.FullName, bs => AirMuseum.AddPlayerNotify.Parser.ParseFrom(bs));
         }
 
         private static void Register(string fullName, Func<ByteString, IMessage> parser)

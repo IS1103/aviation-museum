@@ -15,8 +15,11 @@
 2. 呼叫 **ConnectAsync(wsUrl)** 或 **ConnectAsync(wsUrl, httpBaseUrl)** 建立 WebSocket 連線
 3. 連線成功後呼叫 **AuthAsync(ValidateReq)** 認證
 4. 依身分使用：
-   - **玩家端**：送 **SendPlayer**（入桌 / 離桌 / 輸入），訂閱 **OnState** 收遊戲狀態
-   - **投影端**：送 **SendState** 更新狀態，訂閱 **OnPlayer** 收玩家操作
+   - **玩家端（device=player）**：送 **SendPlayer**（如 ENTRY／離桌／輸入）；訂閱 **OnState** 依產品需求處理。
+   - **投影端（gameScreen／projector）**：送 **SendState**，訂閱 **OnPlayer**。
+   - **固定螢幕（playerRegisterScreen 等）**：多數場景僅連線並 **AuthAsync**，`token` 可空；協定細節見 `game-link/services/air-museum/doc/流程與時序.md`。
+
+**連線 uid**（伺服器發配）：`gameScreen`／`projector` **= 1**，`playerRegisterScreen` **= 2**，`airplaneScreen` **= 3**，`playerGameEndScreen` **= 4**；手持 **≥ 5**。**uid 1～4** 在 Postgres 對應 **player** 表啟動時寫入的種子列（`name` 以 `__fixture.` 為前綴）；手持對應之列由 **`CreatePlayer`** 建立。**單館單線**：同一種非 player 終端在同一伺服器下同時至多一通連線。
 
 ---
 
@@ -81,12 +84,12 @@ async void Start()
     if (!svc.IsConnected)
         return; // 連線失敗會已透過 OnError 通知
 
-    // 組裝認證參數（token 由你們後端／登入流程提供）
+    // 認證：身分以 Device 為準；Token 選填（主畫面可空；續玩 uid=n；首登 register&name=…&age=…&sex=…）
     var payload = new ValidateReq
     {
-        Token = "your-jwt-or-key=uid&device=player",
+        Token = "uid=123",
         GateSid = "",
-        Device = "player"  // 或 "projector"
+        Device = "player" // 遊戲投影幕用 gameScreen；另見 doc「裝置對照表」
     };
     await svc.AuthAsync(payload);
 }
@@ -134,7 +137,8 @@ AirMuseumService.Instance.SendState(state);
 
 - **事件僅支援 +=**，不提供 unsubscribe API；若腳本會被 Destroy，可在 `OnDestroy` 裡避免在回調內操作已銷毀的物件（例如先設 flag 或改用弱參考）。
 - **ConnectAsync** 僅 **wsUrl** 必填；第二參數 **httpBaseUrl** 可省略或傳 `null`（保留舊呼叫相容）。
-- 投影端 device=projector 認證後即入房；玩家端 device=player 認證後需再送 **SendPlayer(Entry)** 入桌。
+- **ValidateReq.Device** 決定終端類型與連線 uid（見上）；Token 規則**僅**對 `device=player`（續玩 `uid=n`／首登 `register&…`）。詳見 `game-link/services/air-museum/doc/流程與時序.md`。
+- **房間／ENTRY 順序**：由目前服務端與產品行為決定，若文件與實際流程不一致，請以程式與遊玩測試為準。
 
 ---
 
@@ -144,5 +148,6 @@ AirMuseumService.Instance.SendState(state);
 - **Unity 在 Windows、服務在 WSL**：Windows 的 `localhost` 不會指到 WSL，連線會失敗。請在 WSL 終端執行 `hostname -I` 取得 IP（例如 `172.18.0.2`），在 Unity 裡將 **wsUrl** 改為 `ws://172.18.0.2:8770/ws` 後再試。
 - 確認服務已啟動且日誌顯示 `WS: 8770`；必要時檢查防火牆是否放行 8770（若仍使用 HTTP 埠則一併放行 8771）。
 
-- 投影端腳本：**Assets/Script/ProjectorClient.cs**（可掛在 GameObject 上）。
-- 手機端／玩家端腳本：**Assets/Script/PlayerClient.cs**（可掛在 GameObject 上，提供入桌／離桌／送輸入與選填 UID、狀態 Text）。
+- 投影端腳本：**Assets/Script/ProjectorClient.cs**。
+- 手機端／玩家端腳本：**Assets/Script/AppPlayerClient.cs**。
+- 玩家註冊大螢：**Assets/Script/PlayerRegisterScreen/PlayerRegisterScreen.cs**。

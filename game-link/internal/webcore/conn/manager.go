@@ -37,18 +37,25 @@ func GetConnectionManager() *ConnectionManager {
 
 // Register 註冊新連接，如果用戶已存在連接則直接覆蓋
 func (cm *ConnectionManager) Register(uid uint32, conn *websocket.Conn) {
+	var superseded []uint32
 	cm.mu.Lock()
-	defer cm.mu.Unlock()
-
-	// 如果該用戶已有連接，記錄日誌
+	// 同一條 WS 只能對應一個 uid：清掉舊 uid，避免關閉連線時只 Unregister 最後一個 uid
+	for u, c := range cm.connections {
+		if c == conn && u != uid {
+			delete(cm.connections, u)
+			superseded = append(superseded, u)
+		}
+	}
 	if _, exists := cm.connections[uid]; exists {
 		logger.Info("User duplicate login, replacing old connection",
 			zap.Uint32("uid", uid),
 		)
 	}
-
-	// 直接覆蓋或新增連接
 	cm.connections[uid] = conn
+	cm.mu.Unlock()
+	for _, u := range superseded {
+		cm.triggerDisconnectCallbacks(u)
+	}
 }
 
 // RegisterDisconnectCallback 註冊斷線回調函數
@@ -66,17 +73,39 @@ func (cm *ConnectionManager) RegisterDisconnectCallback(callback DisconnectCallb
 func (cm *ConnectionManager) Unregister(uid uint32) {
 	cm.mu.Lock()
 	wasConnected := false
-		if _, exists := cm.connections[uid]; exists {
-			delete(cm.connections, uid)
-			wasConnected = true
+	if _, exists := cm.connections[uid]; exists {
+		delete(cm.connections, uid)
+		wasConnected = true
 		logger.GateInfo(fmt.Sprintf("[%d] disconnected, online: %d", uid, len(cm.connections)))
-		}
+	}
 	cm.mu.Unlock()
 
 	// 如果連接存在，觸發斷線回調
 	// 注意：不自動清理頻道訂閱，讓業務邏輯層決定何時取消訂閱
 	// 這樣即使玩家斷線，頻道訂閱也會保留，重連後可以繼續接收消息
 	if wasConnected {
+		cm.triggerDisconnectCallbacks(uid)
+	}
+}
+
+// UnregisterByConn 依 WebSocket 連線移除：同一條連線曾以多個 uid Register（例如重複 auth）時一併清除。
+// 連線關閉時應優先呼叫此方法，避免只 Unregister(最後 uid) 而漏掉舊 uid 或未觸發回調。
+func (cm *ConnectionManager) UnregisterByConn(wsConn *websocket.Conn) {
+	if wsConn == nil {
+		return
+	}
+	cm.mu.Lock()
+	var uids []uint32
+	for uid, c := range cm.connections {
+		if c == wsConn {
+			delete(cm.connections, uid)
+			uids = append(uids, uid)
+		}
+	}
+	online := len(cm.connections)
+	cm.mu.Unlock()
+	for _, uid := range uids {
+		logger.GateInfo(fmt.Sprintf("[%d] disconnected, online: %d", uid, online))
 		cm.triggerDisconnectCallbacks(uid)
 	}
 }
@@ -340,7 +369,7 @@ func (cm *ConnectionManager) HandleDuplicateLogin(ctx context.Context, uid uint3
 	// 關閉舊連接
 	oldConn.Close(websocket.StatusNormalClosure, "Duplicate login detected")
 
-	// 從 ConnectionManager 移除舊連接（不觸發斷線回調，因為這是主動關閉）
+	// 從 ConnectionManager 移除舊連接，並觸發斷線回調（房間清理等）
 	cm.mu.Lock()
 	if _, exists := cm.connections[uid]; exists && cm.connections[uid] == oldConn {
 		delete(cm.connections, uid)
@@ -350,6 +379,8 @@ func (cm *ConnectionManager) HandleDuplicateLogin(ctx context.Context, uid uint3
 		)
 	}
 	cm.mu.Unlock()
+
+	cm.triggerDisconnectCallbacks(uid)
 
 	return true
 }

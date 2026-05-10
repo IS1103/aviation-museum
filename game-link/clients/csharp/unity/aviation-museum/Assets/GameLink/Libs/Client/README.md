@@ -26,17 +26,17 @@ var transport = new DefaultWebSocketTransport();
 var client = new WebsocketClient("ws://localhost:8080/ws", transport, autoReconnect: true);
 
 client.OnNotifyErr((route, msg) => Debug.LogError($"[{route}] {msg}"));
-client.OnNotify<AirMuseum.PlayerInput>("air_museum/player", data => { /* 處理 entry/leave/input */ });
+client.OnNotify<AirMuseum.PlayerInput>("air_museum/player", data => { /* 處理 PlayerInput actions */ });
 client.OnNotify<AirMuseum.GameState>("air_museum/state", data => { /* 處理 state + uids */ });
 
 await client.ConnectAsync();
 await client.WaitForConnectionAsync();
 
-// auth
-var (task, _) = client.Request<Gate.ValidateReq, Gate.ValidateResp>("auth/validate", new ValidateReq { Token = "key=1&device=player" });
+// auth（身分以 ValidateReq.Device 為準，勿在 Token 使用 key= / device=）
+var (task, _) = client.Request<Gate.ValidateReq, Gate.ValidateResp>("auth/validate", new ValidateReq { Device = "player", Token = "uid=123" });
 var resp = await task;
 
-// 玩家送 player（entry）
+// 範例：玩家送 air_museum/player（實際 action 依遊戲流程）
 client.Notify("air_museum/player", new AirMuseum.PlayerInput { Action = AirMuseum.Action.Entry });
 ```
 

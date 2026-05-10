@@ -1,0 +1,16 @@
+# Blender 5.0.1 MTL File: 'None'
+# www.blender.org
+
+newmtl tripo_mat_ecff2da7-035f-47da-be43-5dea97bf50e9
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd tripo_image_ecff2da7-035f-47da-be43-5dea97bf50e9_0_0.jpg
+map_Ns purplejettoy3dmodel_roughness.JPEG
+map_Pr purplejettoy3dmodel_roughness.JPEG
+map_refl purplejettoy3dmodel_metallic.JPEG
+map_Pm purplejettoy3dmodel_metallic.JPEG
+map_Bump -bm 1.000000 tripo_image_ecff2da7-035f-47da-be43-5dea97bf50e9_0_3.jpg

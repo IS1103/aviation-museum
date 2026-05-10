@@ -1,7 +1,6 @@
-// PlayerRegistrationForm.cs - 玩家首登表單（姓名／年齡／性別）→ register token 呼叫 auth/validate。
-// 與 protobuf 的 AirMuseum.PlayerInput 不同名，可直接使用 AirMuseum 命名空間型別而不混淆。
+// PlayerRegistrationForm.cs - 玩家姓名／年齡／性別表單 → 寫入 PlayerPrefs，並以 SAVE_APPEARANCE 同步已建檔之 uid（須先完成 auth/validate）。
+using AirMuseum;
 using Cysharp.Threading.Tasks;
-using Gate;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +17,14 @@ public class PlayerRegistrationForm : MonoBehaviour
     [SerializeField] private Toggle femaleToggle;
     [Tooltip("非二元 → sex=2")]
     [SerializeField] private Toggle nonBinaryToggle;
+
+    [Header("性別 Label（被選擇時改成 selectedLabelColor，否則還原）")]
+    [SerializeField] private Text maleLabel;
+    [SerializeField] private Text femaleLabel;
+    [SerializeField] private Color selectedLabelColor = Color.black;
+
+    private Color _maleOriginalColor;
+    private Color _femaleOriginalColor;
 
     [Header("確定按鈕")]
     [SerializeField] private Button submitButton;
@@ -37,6 +44,9 @@ public class PlayerRegistrationForm : MonoBehaviour
     {
         AirMuseum.AirMuseumService.Instance.OnError += OnAirMuseumError;
         _subscribed = true;
+
+        if (maleLabel != null) _maleOriginalColor = maleLabel.color;
+        if (femaleLabel != null) _femaleOriginalColor = femaleLabel.color;
     }
 
     private void OnDestroy()
@@ -49,14 +59,37 @@ public class PlayerRegistrationForm : MonoBehaviour
         }
         if (submitButton != null)
             submitButton.onClick.RemoveListener(OnSubmitClicked);
+
+        if (maleToggle != null) maleToggle.onValueChanged.RemoveListener(OnMaleToggleChanged);
+        if (femaleToggle != null) femaleToggle.onValueChanged.RemoveListener(OnFemaleToggleChanged);
     }
 
     private void Start()
     {
-        PlayerPrefs.DeleteAll();
         if (submitButton != null)
             submitButton.onClick.AddListener(OnSubmitClicked);
+
+        if (maleToggle != null)
+        {
+            maleToggle.onValueChanged.AddListener(OnMaleToggleChanged);
+            ApplyLabelColor(maleLabel, _maleOriginalColor, maleToggle.isOn);
+        }
+        if (femaleToggle != null)
+        {
+            femaleToggle.onValueChanged.AddListener(OnFemaleToggleChanged);
+            ApplyLabelColor(femaleLabel, _femaleOriginalColor, femaleToggle.isOn);
+        }
+
         SetStatus("");
+    }
+
+    private void OnMaleToggleChanged(bool isOn) => ApplyLabelColor(maleLabel, _maleOriginalColor, isOn);
+    private void OnFemaleToggleChanged(bool isOn) => ApplyLabelColor(femaleLabel, _femaleOriginalColor, isOn);
+
+    private void ApplyLabelColor(Text label, Color originalColor, bool isOn)
+    {
+        if (label == null) return;
+        label.color = isOn ? selectedLabelColor : originalColor;
     }
 
     private void OnSubmitClicked()
@@ -83,7 +116,6 @@ public class PlayerRegistrationForm : MonoBehaviour
         DoRegisterAsync(name, age, sex).Forget();
     }
 
-    // 讀 Toggle 狀態；對應關係：男=0、女=1、非二元=2。全未選退回 0。
     private int GetSelectedSex()
     {
         if (maleToggle != null && maleToggle.isOn) return 0;
@@ -107,36 +139,42 @@ public class PlayerRegistrationForm : MonoBehaviour
             return;
         }
 
-        string token = AirMuseum.AirMuseumService.BuildRegisterToken(name, age, sex, "player");
-        var req = new ValidateReq { Token = token, GateSid = "", Device = "player" };
-
-        ValidateResp resp = await svc.AuthAsync(req);
-        if (_destroyed) return;
-
-        if (resp == null)
+        int sessionUid = PlayerPrefs.GetInt("air_museum_uid", 0);
+        if (sessionUid <= 0)
         {
-            SetStatus("註冊失敗，請再試一次");
+            SetStatus("請先完成連線認證（無有效 session uid）");
             SetInteractable(true);
             _submitting = false;
             return;
         }
 
-        uint newUid = resp.Uid;
-        PlayerPrefs.SetInt("air_museum_uid", (int)newUid);
         PlayerPrefs.SetString("air_museum_name", name);
         PlayerPrefs.SetInt("air_museum_age", age);
         PlayerPrefs.SetInt("air_museum_sex", sex);
         PlayerPrefs.Save();
 
-        Debug.Log($"[PlayerRegistrationForm] 註冊成功 uid={newUid} name={name} age={age} sex={sex}");
-        SetStatus($"歡迎 {name}（uid={newUid}）");
+        int ageInt = Mathf.Clamp(age, 0, 150);
+        svc.SendPlayer(new PlayerInput
+        {
+            Action = Action.SaveAppearance,
+            Name = name,
+            Age = (uint)ageInt,
+            Sex = sex,
+            AvatarEyes = PlayerPrefs.GetInt("air_museum_eyes_index", 0),
+            AvatarEyebrow = PlayerPrefs.GetInt("air_museum_eyebrow_index", 0),
+            AvatarMouth = PlayerPrefs.GetInt("air_museum_mouth_index", 0),
+            AvatarGlasses = PlayerPrefs.GetInt("air_museum_glasses_index", -1),
+            AvatarHelmet = PlayerPrefs.GetInt("air_museum_helmet_index", 0),
+        });
+
+        Debug.Log($"[PlayerRegistrationForm] 已送出名冊與裝扮索引 uid={sessionUid} name={name}");
+        SetStatus($"歡迎 {name}");
 
         _submitting = false;
+        SetInteractable(true);
 
         if (nextGameObject != null)
-        {
             nextGameObject.SetActive(true);
-        }
         gameObject.SetActive(false);
     }
 

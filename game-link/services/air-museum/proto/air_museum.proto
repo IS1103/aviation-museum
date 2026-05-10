@@ -5,15 +5,13 @@ option go_package = "air-museum/proto/pb;air_museum";
 option csharp_namespace = "AirMuseum";
 
 // =============================================================================
-// air-museum 設計：兩端共用 auth/validate（同時承擔玩家首登註冊）；其餘各只用一個 WebSocket API。
-// - auth/validate（gate 共用路由）：
-//     * 投影端：       token = "device=projector"
-//     * 玩家續玩：     token = "key=<uid>&device=player"
-//     * 玩家首登註冊： token = "register&name=<url-encoded>&age=<n>&sex=<n>&device=player"
-//       伺服器於 auth handler 內 db.CreatePlayer 後直接 SetUID / Register，一次完成建檔+認證+綁連線。
-// - 玩家端 notify/air_museum/player（PlayerInput）：action=ENTRY|LEAVE|INPUT|SAVE_APPEARANCE
+// air-museum 設計：兩端共用 auth/validate；其餘各只用一個 WebSocket API。
+// - auth/validate：身分一律用 gate.ValidateReq.device（見服務 doc「裝置對照表」）。
+//   token 僅選填：uid=<n> 續連；register&name=… 相容舊版首登。勿再使用 key=、勿在 token 內帶 device。
+// - 玩家 notify/air_museum/player（PlayerInput）：action=ENTRY|LEAVE|INPUT|SAVE_APPEARANCE
 //   SAVE_APPEARANCE：將 name/age/sex 與 avatar_* 寫入 Postgres（uid 以連線為準）
-// - 投影端唯一 API：notify/air_museum/state（GameState：state）
+// - Server notify air_museum/add_player（AddPlayerNotify）：推給玩家註冊大螢等（目前於 SAVE_APPEARANCE 成功後）
+// - 主畫面 notify/air_museum/state（GameState：state）
 // Service：連線、投影↔玩家轉發／廣播。
 // 玩家顯示資料請由各端自行處理；Postgres 表 player 由服務啟動時建立（uid、session、name、age、sex、avatar_*、game_score、landing_score、ranking、creattime 等）。
 // =============================================================================
@@ -65,4 +63,22 @@ message PlayerInput {
 // 錯誤通知：Server → Client（notify/error）；client 須訂閱此事件
 message ErrorNotify {
   string msg = 1;   // 錯誤訊息，如「主機已重連，請點擊登入重新 entry」
+}
+
+// Server→玩家註冊大螢等：推送一名玩家在 DB 之一整列對應欄位（例如在 SAVE_APPEARANCE 成功後由 Server 依 uid 重新讀出）。
+message AddPlayerNotify {
+  uint32 uid = 1;
+  string name = 2;
+  uint32 age = 3;
+  int32 sex = 4;
+  int32 avatar_eyes = 5;
+  int32 avatar_eyebrow = 6;
+  int32 avatar_mouth = 7;
+  int32 avatar_glasses = 8;
+  int32 avatar_helmet = 9;
+  int32 mission = 10;
+  int32 game_score = 11;
+  int32 landing_score = 12;
+  int32 ranking = 13;
+  int64 creattime_unix_seconds = 14;
 }

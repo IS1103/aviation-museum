@@ -1,0 +1,16 @@
+# Blender 5.0.1 MTL File: 'None'
+# www.blender.org
+
+newmtl tripo_mat_dd7b626b-839d-4315-aca7-697f942ca2b8
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd tripo_image_dd7b626b-839d-4315-aca7-697f942ca2b8_0_0.jpg
+map_Ns militaryjet3dmodel_roughness.JPEG
+map_Pr militaryjet3dmodel_roughness.JPEG
+map_refl militaryjet3dmodel_metallic.JPEG
+map_Pm militaryjet3dmodel_metallic.JPEG
+map_Bump -bm 1.000000 tripo_image_dd7b626b-839d-4315-aca7-697f942ca2b8_0_3.jpg

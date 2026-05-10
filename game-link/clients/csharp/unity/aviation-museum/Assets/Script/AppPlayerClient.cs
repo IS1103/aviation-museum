@@ -12,15 +12,19 @@ namespace AirMuseum
     /// 手機端 Client：device=player 認證後可入桌、離桌、送遊戲輸入；
     /// 主要訂閱 OnState 收遊戲階段與房內玩家，錯誤經 OnError。
     /// </summary>
+    [DefaultExecutionOrder(-100)]
     public class AppPlayerClient : MonoBehaviour
     {
         [Header("連線設定")]
         [Tooltip("服務端路徑為 /ws。手機與服務同網段時可用本機 IP，例如 ws://192.168.1.100:8770/ws")]
         [SerializeField] private string wsUrl = "ws://localhost:8770/ws";
 
-        [Header("認證（玩家端用 device=player）")]
-        [Tooltip("續玩：key=<uid>&device=player；首登：register&name=<url-encoded>&age=<n>&sex=<n>&device=player")]
-        [SerializeField] private string authToken = "key=1&device=player";
+        [Header("認證")]
+        [Tooltip("ValidateReq.Device。玩家 app 用 player；其它見 aviation-museum 裝置對照表。")]
+        [SerializeField] private string authDevice = "player";
+
+        [Tooltip("除錯覆寫。留空則每次開啟皆新玩家（先 DeleteAll 再認證，token 為空）。")]
+        [SerializeField] private string authToken = "";
 
         // [Header("UI（選填）")]
         // [Tooltip("認證成功後會顯示 UID")]
@@ -36,6 +40,9 @@ namespace AirMuseum
 
         private void Awake()
         {
+            // 手機 app 每次開啟視為新玩家：清掉舊 uid／註冊與裝扮快取，避免續連上一局身分。
+            PlayerPrefs.DeleteAll();
+
             var svc = AirMuseumService.Instance;
             svc.OnState += OnStateMessage;
             svc.OnError += OnErrorMessage;
@@ -64,11 +71,14 @@ namespace AirMuseum
             }
 
             SetStatus("認證中…");
+            // 每次冷啟已 DeleteAll，此處不讀舊 uid；除錯請在 Inspector 填 authToken（例如 uid=123）。
+            var token = authToken ?? "";
+
             var payload = new ValidateReq
             {
-                Token = authToken,
+                Token = token ?? "",
                 GateSid = "",
-                Device = "player"
+                Device = authDevice
             };
             var resp = await svc.AuthAsync(payload);
             if (_destroyed) return;
@@ -79,7 +89,9 @@ namespace AirMuseum
             }
 
             _myUid = resp.Uid;
-            Debug.Log($"[手機端] 認證成功 uid={_myUid}");
+            PlayerPrefs.SetInt("air_museum_uid", (int)_myUid);
+            PlayerPrefs.Save();
+            Debug.Log($"[手機端] 認證成功 uid={_myUid}（已寫入 PlayerPrefs）");
             // if (uidText != null)
             //     uidText.text = "UID: " + _myUid;
             SetStatus("已連線 (入桌請按入桌)");

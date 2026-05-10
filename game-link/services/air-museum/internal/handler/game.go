@@ -65,6 +65,14 @@ func playerNotify(ctx context.Context, uid uint32, req *pb.PlayerInput) error {
 			return err
 		}
 		logger.GateInfo(fmt.Sprintf("[air_museum] uid=%d saved profile to db", uid))
+		if !db.IsReservedFixtureUID(uid) {
+			notify, loadErr := db.LoadAddPlayerNotify(ctx, uid)
+			if loadErr != nil {
+				logger.GateWarnf("[air_museum] add_player load uid=%d: %v", uid, loadErr)
+			} else {
+				sendAddPlayerNotifyToRegisterScreen(ctx, notify)
+			}
+		}
 	default:
 		// ACTION_UNSPECIFIED 等忽略
 	}
@@ -91,6 +99,20 @@ func sendPlayerToHost(ctx context.Context, r *room.Room, action pb.Action, uid u
 	}
 	packData, _ := proto.Marshal(pack)
 	_ = conn.GetConnectionManager().SendToUser(ctx, hostUid, packData)
+}
+
+// sendAddPlayerNotifyToRegisterScreen 將 notify air_museum/add_player 送至玩家註冊大螢（WS uid=db.PlayerRegisterScreenUID）。
+func sendAddPlayerNotifyToRegisterScreen(ctx context.Context, out *pb.AddPlayerNotify) {
+	anyInfo, err := anypb.New(out)
+	if err != nil {
+		return
+	}
+	pack, err := common.Builder.BuildNotifyPack("air_museum/add_player", anyInfo)
+	if err != nil {
+		return
+	}
+	packData, _ := proto.Marshal(pack)
+	_ = conn.GetConnectionManager().SendToUser(ctx, db.PlayerRegisterScreenUID, packData)
 }
 
 // stateNotify 投影端唯一 API：notify/air_museum/state，payload 為 GameState。僅主機可送；以 state + 房內 uids 廣播給所有玩家，非遊戲中時清掉「遊戲中斷線」名單。

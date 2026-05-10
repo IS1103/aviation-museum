@@ -68,7 +68,12 @@ public class SetLang : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+
+        // 勿對整個 Canvas / 大型 UI 根直接 DontDestroyOnLoad（Unity 6+ 可能觸發 m_Hierarchies 斷言）；
+        // 改為只持久化一個空根，再把此物件掛到其下。
+        var persistence = new GameObject(nameof(SetLang) + "_Persistence");
+        DontDestroyOnLoad(persistence);
+        transform.SetParent(persistence.transform, false);
 
         Load();
 

@@ -32,20 +32,28 @@ namespace AirMuseum {
             "ZRgHIAEoDRILCgNzZXgYCCABKAUSEwoLYXZhdGFyX2V5ZXMYCSABKAUSFgoO",
             "YXZhdGFyX2V5ZWJyb3cYCiABKAUSFAoMYXZhdGFyX21vdXRoGAsgASgFEhYK",
             "DmF2YXRhcl9nbGFzc2VzGAwgASgFEhUKDWF2YXRhcl9oZWxtZXQYDSABKAUi",
-            "GgoLRXJyb3JOb3RpZnkSCwoDbXNnGAEgASgJKnIKBkFjdGlvbhIWChJBQ1RJ",
-            "T05fVU5TUEVDSUZJRUQQABIQCgxBQ1RJT05fRU5UUlkQARIQCgxBQ1RJT05f",
-            "TEVBVkUQAhIQCgxBQ1RJT05fSU5QVVQQAxIaChZBQ1RJT05fU0FWRV9BUFBF",
-            "QVJBTkNFEAQqhwEKCUdhbWVQaGFzZRIaChZHQU1FX1BIQVNFX1VOU1BFQ0lG",
-            "SUVEEAASHAoYR0FNRV9QSEFTRV9XQUlUSU5HX0VOVFJZEAESEwoPR0FNRV9Q",
-            "SEFTRV9ERU1PEAISFgoSR0FNRV9QSEFTRV9QTEFZSU5HEAMSEwoPR0FNRV9Q",
-            "SEFTRV9GVUxMEARCLFoeYWlyLW11c2V1bS9wcm90by9wYjthaXJfbXVzZXVt",
-            "qgIJQWlyTXVzZXVtYgZwcm90bzM="));
+            "GgoLRXJyb3JOb3RpZnkSCwoDbXNnGAEgASgJIqUCCg9BZGRQbGF5ZXJOb3Rp",
+            "ZnkSCwoDdWlkGAEgASgNEgwKBG5hbWUYAiABKAkSCwoDYWdlGAMgASgNEgsK",
+            "A3NleBgEIAEoBRITCgthdmF0YXJfZXllcxgFIAEoBRIWCg5hdmF0YXJfZXll",
+            "YnJvdxgGIAEoBRIUCgxhdmF0YXJfbW91dGgYByABKAUSFgoOYXZhdGFyX2ds",
+            "YXNzZXMYCCABKAUSFQoNYXZhdGFyX2hlbG1ldBgJIAEoBRIPCgdtaXNzaW9u",
+            "GAogASgFEhIKCmdhbWVfc2NvcmUYCyABKAUSFQoNbGFuZGluZ19zY29yZRgM",
+            "IAEoBRIPCgdyYW5raW5nGA0gASgFEh4KFmNyZWF0dGltZV91bml4X3NlY29u",
+            "ZHMYDiABKAMqcgoGQWN0aW9uEhYKEkFDVElPTl9VTlNQRUNJRklFRBAAEhAK",
+            "DEFDVElPTl9FTlRSWRABEhAKDEFDVElPTl9MRUFWRRACEhAKDEFDVElPTl9J",
+            "TlBVVBADEhoKFkFDVElPTl9TQVZFX0FQUEVBUkFOQ0UQBCqHAQoJR2FtZVBo",
+            "YXNlEhoKFkdBTUVfUEhBU0VfVU5TUEVDSUZJRUQQABIcChhHQU1FX1BIQVNF",
+            "X1dBSVRJTkdfRU5UUlkQARITCg9HQU1FX1BIQVNFX0RFTU8QAhIWChJHQU1F",
+            "X1BIQVNFX1BMQVlJTkcQAxITCg9HQU1FX1BIQVNFX0ZVTEwQBEIsWh5haXIt",
+            "bXVzZXVtL3Byb3RvL3BiO2Fpcl9tdXNldW2qAglBaXJNdXNldW1iBnByb3Rv",
+            "Mw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::AirMuseum.Action), typeof(global::AirMuseum.GamePhase), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::AirMuseum.GameState), global::AirMuseum.GameState.Parser, new[]{ "State", "Uids" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::AirMuseum.PlayerInput), global::AirMuseum.PlayerInput.Parser, new[]{ "Action", "Uid", "AxisX", "AxisY", "Seq", "Name", "Age", "Sex", "AvatarEyes", "AvatarEyebrow", "AvatarMouth", "AvatarGlasses", "AvatarHelmet" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::AirMuseum.ErrorNotify), global::AirMuseum.ErrorNotify.Parser, new[]{ "Msg" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::AirMuseum.ErrorNotify), global::AirMuseum.ErrorNotify.Parser, new[]{ "Msg" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::AirMuseum.AddPlayerNotify), global::AirMuseum.AddPlayerNotify.Parser, new[]{ "Uid", "Name", "Age", "Sex", "AvatarEyes", "AvatarEyebrow", "AvatarMouth", "AvatarGlasses", "AvatarHelmet", "Mission", "GameScore", "LandingScore", "Ranking", "CreattimeUnixSeconds" }, null, null, null, null)
           }));
     }
     #endregion
@@ -1202,6 +1210,688 @@ namespace AirMuseum {
             break;
           case 10: {
             Msg = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// Server→玩家註冊大螢等：推送一名玩家在 DB 之一整列對應欄位（例如在 SAVE_APPEARANCE 成功後由 Server 依 uid 重新讀出）。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class AddPlayerNotify : pb::IMessage<AddPlayerNotify>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<AddPlayerNotify> _parser = new pb::MessageParser<AddPlayerNotify>(() => new AddPlayerNotify());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<AddPlayerNotify> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::AirMuseum.AirMuseumReflection.Descriptor.MessageTypes[3]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AddPlayerNotify() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AddPlayerNotify(AddPlayerNotify other) : this() {
+      uid_ = other.uid_;
+      name_ = other.name_;
+      age_ = other.age_;
+      sex_ = other.sex_;
+      avatarEyes_ = other.avatarEyes_;
+      avatarEyebrow_ = other.avatarEyebrow_;
+      avatarMouth_ = other.avatarMouth_;
+      avatarGlasses_ = other.avatarGlasses_;
+      avatarHelmet_ = other.avatarHelmet_;
+      mission_ = other.mission_;
+      gameScore_ = other.gameScore_;
+      landingScore_ = other.landingScore_;
+      ranking_ = other.ranking_;
+      creattimeUnixSeconds_ = other.creattimeUnixSeconds_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AddPlayerNotify Clone() {
+      return new AddPlayerNotify(this);
+    }
+
+    /// <summary>Field number for the "uid" field.</summary>
+    public const int UidFieldNumber = 1;
+    private uint uid_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Uid {
+      get { return uid_; }
+      set {
+        uid_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "name" field.</summary>
+    public const int NameFieldNumber = 2;
+    private string name_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Name {
+      get { return name_; }
+      set {
+        name_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "age" field.</summary>
+    public const int AgeFieldNumber = 3;
+    private uint age_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Age {
+      get { return age_; }
+      set {
+        age_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "sex" field.</summary>
+    public const int SexFieldNumber = 4;
+    private int sex_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int Sex {
+      get { return sex_; }
+      set {
+        sex_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "avatar_eyes" field.</summary>
+    public const int AvatarEyesFieldNumber = 5;
+    private int avatarEyes_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int AvatarEyes {
+      get { return avatarEyes_; }
+      set {
+        avatarEyes_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "avatar_eyebrow" field.</summary>
+    public const int AvatarEyebrowFieldNumber = 6;
+    private int avatarEyebrow_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int AvatarEyebrow {
+      get { return avatarEyebrow_; }
+      set {
+        avatarEyebrow_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "avatar_mouth" field.</summary>
+    public const int AvatarMouthFieldNumber = 7;
+    private int avatarMouth_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int AvatarMouth {
+      get { return avatarMouth_; }
+      set {
+        avatarMouth_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "avatar_glasses" field.</summary>
+    public const int AvatarGlassesFieldNumber = 8;
+    private int avatarGlasses_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int AvatarGlasses {
+      get { return avatarGlasses_; }
+      set {
+        avatarGlasses_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "avatar_helmet" field.</summary>
+    public const int AvatarHelmetFieldNumber = 9;
+    private int avatarHelmet_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int AvatarHelmet {
+      get { return avatarHelmet_; }
+      set {
+        avatarHelmet_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "mission" field.</summary>
+    public const int MissionFieldNumber = 10;
+    private int mission_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int Mission {
+      get { return mission_; }
+      set {
+        mission_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "game_score" field.</summary>
+    public const int GameScoreFieldNumber = 11;
+    private int gameScore_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int GameScore {
+      get { return gameScore_; }
+      set {
+        gameScore_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "landing_score" field.</summary>
+    public const int LandingScoreFieldNumber = 12;
+    private int landingScore_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int LandingScore {
+      get { return landingScore_; }
+      set {
+        landingScore_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "ranking" field.</summary>
+    public const int RankingFieldNumber = 13;
+    private int ranking_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int Ranking {
+      get { return ranking_; }
+      set {
+        ranking_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "creattime_unix_seconds" field.</summary>
+    public const int CreattimeUnixSecondsFieldNumber = 14;
+    private long creattimeUnixSeconds_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long CreattimeUnixSeconds {
+      get { return creattimeUnixSeconds_; }
+      set {
+        creattimeUnixSeconds_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as AddPlayerNotify);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(AddPlayerNotify other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Uid != other.Uid) return false;
+      if (Name != other.Name) return false;
+      if (Age != other.Age) return false;
+      if (Sex != other.Sex) return false;
+      if (AvatarEyes != other.AvatarEyes) return false;
+      if (AvatarEyebrow != other.AvatarEyebrow) return false;
+      if (AvatarMouth != other.AvatarMouth) return false;
+      if (AvatarGlasses != other.AvatarGlasses) return false;
+      if (AvatarHelmet != other.AvatarHelmet) return false;
+      if (Mission != other.Mission) return false;
+      if (GameScore != other.GameScore) return false;
+      if (LandingScore != other.LandingScore) return false;
+      if (Ranking != other.Ranking) return false;
+      if (CreattimeUnixSeconds != other.CreattimeUnixSeconds) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Uid != 0) hash ^= Uid.GetHashCode();
+      if (Name.Length != 0) hash ^= Name.GetHashCode();
+      if (Age != 0) hash ^= Age.GetHashCode();
+      if (Sex != 0) hash ^= Sex.GetHashCode();
+      if (AvatarEyes != 0) hash ^= AvatarEyes.GetHashCode();
+      if (AvatarEyebrow != 0) hash ^= AvatarEyebrow.GetHashCode();
+      if (AvatarMouth != 0) hash ^= AvatarMouth.GetHashCode();
+      if (AvatarGlasses != 0) hash ^= AvatarGlasses.GetHashCode();
+      if (AvatarHelmet != 0) hash ^= AvatarHelmet.GetHashCode();
+      if (Mission != 0) hash ^= Mission.GetHashCode();
+      if (GameScore != 0) hash ^= GameScore.GetHashCode();
+      if (LandingScore != 0) hash ^= LandingScore.GetHashCode();
+      if (Ranking != 0) hash ^= Ranking.GetHashCode();
+      if (CreattimeUnixSeconds != 0L) hash ^= CreattimeUnixSeconds.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Uid != 0) {
+        output.WriteRawTag(8);
+        output.WriteUInt32(Uid);
+      }
+      if (Name.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Name);
+      }
+      if (Age != 0) {
+        output.WriteRawTag(24);
+        output.WriteUInt32(Age);
+      }
+      if (Sex != 0) {
+        output.WriteRawTag(32);
+        output.WriteInt32(Sex);
+      }
+      if (AvatarEyes != 0) {
+        output.WriteRawTag(40);
+        output.WriteInt32(AvatarEyes);
+      }
+      if (AvatarEyebrow != 0) {
+        output.WriteRawTag(48);
+        output.WriteInt32(AvatarEyebrow);
+      }
+      if (AvatarMouth != 0) {
+        output.WriteRawTag(56);
+        output.WriteInt32(AvatarMouth);
+      }
+      if (AvatarGlasses != 0) {
+        output.WriteRawTag(64);
+        output.WriteInt32(AvatarGlasses);
+      }
+      if (AvatarHelmet != 0) {
+        output.WriteRawTag(72);
+        output.WriteInt32(AvatarHelmet);
+      }
+      if (Mission != 0) {
+        output.WriteRawTag(80);
+        output.WriteInt32(Mission);
+      }
+      if (GameScore != 0) {
+        output.WriteRawTag(88);
+        output.WriteInt32(GameScore);
+      }
+      if (LandingScore != 0) {
+        output.WriteRawTag(96);
+        output.WriteInt32(LandingScore);
+      }
+      if (Ranking != 0) {
+        output.WriteRawTag(104);
+        output.WriteInt32(Ranking);
+      }
+      if (CreattimeUnixSeconds != 0L) {
+        output.WriteRawTag(112);
+        output.WriteInt64(CreattimeUnixSeconds);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Uid != 0) {
+        output.WriteRawTag(8);
+        output.WriteUInt32(Uid);
+      }
+      if (Name.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Name);
+      }
+      if (Age != 0) {
+        output.WriteRawTag(24);
+        output.WriteUInt32(Age);
+      }
+      if (Sex != 0) {
+        output.WriteRawTag(32);
+        output.WriteInt32(Sex);
+      }
+      if (AvatarEyes != 0) {
+        output.WriteRawTag(40);
+        output.WriteInt32(AvatarEyes);
+      }
+      if (AvatarEyebrow != 0) {
+        output.WriteRawTag(48);
+        output.WriteInt32(AvatarEyebrow);
+      }
+      if (AvatarMouth != 0) {
+        output.WriteRawTag(56);
+        output.WriteInt32(AvatarMouth);
+      }
+      if (AvatarGlasses != 0) {
+        output.WriteRawTag(64);
+        output.WriteInt32(AvatarGlasses);
+      }
+      if (AvatarHelmet != 0) {
+        output.WriteRawTag(72);
+        output.WriteInt32(AvatarHelmet);
+      }
+      if (Mission != 0) {
+        output.WriteRawTag(80);
+        output.WriteInt32(Mission);
+      }
+      if (GameScore != 0) {
+        output.WriteRawTag(88);
+        output.WriteInt32(GameScore);
+      }
+      if (LandingScore != 0) {
+        output.WriteRawTag(96);
+        output.WriteInt32(LandingScore);
+      }
+      if (Ranking != 0) {
+        output.WriteRawTag(104);
+        output.WriteInt32(Ranking);
+      }
+      if (CreattimeUnixSeconds != 0L) {
+        output.WriteRawTag(112);
+        output.WriteInt64(CreattimeUnixSeconds);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Uid != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Uid);
+      }
+      if (Name.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
+      }
+      if (Age != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Age);
+      }
+      if (Sex != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Sex);
+      }
+      if (AvatarEyes != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(AvatarEyes);
+      }
+      if (AvatarEyebrow != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(AvatarEyebrow);
+      }
+      if (AvatarMouth != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(AvatarMouth);
+      }
+      if (AvatarGlasses != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(AvatarGlasses);
+      }
+      if (AvatarHelmet != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(AvatarHelmet);
+      }
+      if (Mission != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Mission);
+      }
+      if (GameScore != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(GameScore);
+      }
+      if (LandingScore != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(LandingScore);
+      }
+      if (Ranking != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Ranking);
+      }
+      if (CreattimeUnixSeconds != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(CreattimeUnixSeconds);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(AddPlayerNotify other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Uid != 0) {
+        Uid = other.Uid;
+      }
+      if (other.Name.Length != 0) {
+        Name = other.Name;
+      }
+      if (other.Age != 0) {
+        Age = other.Age;
+      }
+      if (other.Sex != 0) {
+        Sex = other.Sex;
+      }
+      if (other.AvatarEyes != 0) {
+        AvatarEyes = other.AvatarEyes;
+      }
+      if (other.AvatarEyebrow != 0) {
+        AvatarEyebrow = other.AvatarEyebrow;
+      }
+      if (other.AvatarMouth != 0) {
+        AvatarMouth = other.AvatarMouth;
+      }
+      if (other.AvatarGlasses != 0) {
+        AvatarGlasses = other.AvatarGlasses;
+      }
+      if (other.AvatarHelmet != 0) {
+        AvatarHelmet = other.AvatarHelmet;
+      }
+      if (other.Mission != 0) {
+        Mission = other.Mission;
+      }
+      if (other.GameScore != 0) {
+        GameScore = other.GameScore;
+      }
+      if (other.LandingScore != 0) {
+        LandingScore = other.LandingScore;
+      }
+      if (other.Ranking != 0) {
+        Ranking = other.Ranking;
+      }
+      if (other.CreattimeUnixSeconds != 0L) {
+        CreattimeUnixSeconds = other.CreattimeUnixSeconds;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Uid = input.ReadUInt32();
+            break;
+          }
+          case 18: {
+            Name = input.ReadString();
+            break;
+          }
+          case 24: {
+            Age = input.ReadUInt32();
+            break;
+          }
+          case 32: {
+            Sex = input.ReadInt32();
+            break;
+          }
+          case 40: {
+            AvatarEyes = input.ReadInt32();
+            break;
+          }
+          case 48: {
+            AvatarEyebrow = input.ReadInt32();
+            break;
+          }
+          case 56: {
+            AvatarMouth = input.ReadInt32();
+            break;
+          }
+          case 64: {
+            AvatarGlasses = input.ReadInt32();
+            break;
+          }
+          case 72: {
+            AvatarHelmet = input.ReadInt32();
+            break;
+          }
+          case 80: {
+            Mission = input.ReadInt32();
+            break;
+          }
+          case 88: {
+            GameScore = input.ReadInt32();
+            break;
+          }
+          case 96: {
+            LandingScore = input.ReadInt32();
+            break;
+          }
+          case 104: {
+            Ranking = input.ReadInt32();
+            break;
+          }
+          case 112: {
+            CreattimeUnixSeconds = input.ReadInt64();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Uid = input.ReadUInt32();
+            break;
+          }
+          case 18: {
+            Name = input.ReadString();
+            break;
+          }
+          case 24: {
+            Age = input.ReadUInt32();
+            break;
+          }
+          case 32: {
+            Sex = input.ReadInt32();
+            break;
+          }
+          case 40: {
+            AvatarEyes = input.ReadInt32();
+            break;
+          }
+          case 48: {
+            AvatarEyebrow = input.ReadInt32();
+            break;
+          }
+          case 56: {
+            AvatarMouth = input.ReadInt32();
+            break;
+          }
+          case 64: {
+            AvatarGlasses = input.ReadInt32();
+            break;
+          }
+          case 72: {
+            AvatarHelmet = input.ReadInt32();
+            break;
+          }
+          case 80: {
+            Mission = input.ReadInt32();
+            break;
+          }
+          case 88: {
+            GameScore = input.ReadInt32();
+            break;
+          }
+          case 96: {
+            LandingScore = input.ReadInt32();
+            break;
+          }
+          case 104: {
+            Ranking = input.ReadInt32();
+            break;
+          }
+          case 112: {
+            CreattimeUnixSeconds = input.ReadInt64();
             break;
           }
         }

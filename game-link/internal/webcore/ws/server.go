@@ -155,13 +155,10 @@ func (s *Server) handleWS() http.HandlerFunc {
 			}
 		}
 
-		// 在連接關閉時清理用戶連接
+		// 在連接關閉時清理用戶連接（依 conn 清除，避免同一條 WS 多個 uid 時漏清）
 		defer func() {
-			// 如果用戶已認證，從連接管理器中移除
-			if uid := wsCtx.GetUID(); uid != 0 {
-				connmgr.GetConnectionManager().Unregister(uid)
-			}
-			conn.Close(websocket.StatusInternalError, "server closed")
+			connmgr.GetConnectionManager().UnregisterByConn(conn)
+			_ = conn.Close(websocket.StatusInternalError, "server closed")
 		}()
 
 		// 創建一個可取消的 context

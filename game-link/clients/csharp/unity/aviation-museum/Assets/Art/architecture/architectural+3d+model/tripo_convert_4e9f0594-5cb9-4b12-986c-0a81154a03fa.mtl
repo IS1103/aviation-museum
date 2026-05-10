@@ -1,0 +1,16 @@
+# Blender 5.0.1 MTL File: 'None'
+# www.blender.org
+
+newmtl tripo_mat_4e9f0594-5cb9-4b12-986c-0a81154a03fa
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd tripo_image_4e9f0594-5cb9-4b12-986c-0a81154a03fa_0_0.jpg
+map_Ns architectural3dmodel_roughness.JPEG
+map_Pr architectural3dmodel_roughness.JPEG
+map_refl architectural3dmodel_metallic.JPEG
+map_Pm architectural3dmodel_metallic.JPEG
+map_Bump -bm 1.000000 tripo_image_4e9f0594-5cb9-4b12-986c-0a81154a03fa_0_3.jpg

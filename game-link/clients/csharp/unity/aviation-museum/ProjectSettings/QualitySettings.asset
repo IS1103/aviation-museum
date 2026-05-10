@@ -109,7 +109,7 @@ QualitySettings:
     terrainDetailDistance: 80
     terrainTreeDistance: 5000
     terrainBillboardStart: 50
-    terrainFadeLength: 5
+    terrainFadeLength: 3.4
     terrainMaxTrees: 50
     excludedTargetPlatforms:
     - Android

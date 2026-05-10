@@ -375,6 +375,155 @@ func (x *ErrorNotify) GetMsg() string {
 	return ""
 }
 
+// Server→玩家註冊大螢等：推送一名玩家在 DB 之一整列對應欄位（例如在 SAVE_APPEARANCE 成功後由 Server 依 uid 重新讀出）。
+type AddPlayerNotify struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	Uid                  uint32                 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	Name                 string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Age                  uint32                 `protobuf:"varint,3,opt,name=age,proto3" json:"age,omitempty"`
+	Sex                  int32                  `protobuf:"varint,4,opt,name=sex,proto3" json:"sex,omitempty"`
+	AvatarEyes           int32                  `protobuf:"varint,5,opt,name=avatar_eyes,json=avatarEyes,proto3" json:"avatar_eyes,omitempty"`
+	AvatarEyebrow        int32                  `protobuf:"varint,6,opt,name=avatar_eyebrow,json=avatarEyebrow,proto3" json:"avatar_eyebrow,omitempty"`
+	AvatarMouth          int32                  `protobuf:"varint,7,opt,name=avatar_mouth,json=avatarMouth,proto3" json:"avatar_mouth,omitempty"`
+	AvatarGlasses        int32                  `protobuf:"varint,8,opt,name=avatar_glasses,json=avatarGlasses,proto3" json:"avatar_glasses,omitempty"`
+	AvatarHelmet         int32                  `protobuf:"varint,9,opt,name=avatar_helmet,json=avatarHelmet,proto3" json:"avatar_helmet,omitempty"`
+	Mission              int32                  `protobuf:"varint,10,opt,name=mission,proto3" json:"mission,omitempty"`
+	GameScore            int32                  `protobuf:"varint,11,opt,name=game_score,json=gameScore,proto3" json:"game_score,omitempty"`
+	LandingScore         int32                  `protobuf:"varint,12,opt,name=landing_score,json=landingScore,proto3" json:"landing_score,omitempty"`
+	Ranking              int32                  `protobuf:"varint,13,opt,name=ranking,proto3" json:"ranking,omitempty"`
+	CreattimeUnixSeconds int64                  `protobuf:"varint,14,opt,name=creattime_unix_seconds,json=creattimeUnixSeconds,proto3" json:"creattime_unix_seconds,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *AddPlayerNotify) Reset() {
+	*x = AddPlayerNotify{}
+	mi := &file_air_museum_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddPlayerNotify) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddPlayerNotify) ProtoMessage() {}
+
+func (x *AddPlayerNotify) ProtoReflect() protoreflect.Message {
+	mi := &file_air_museum_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddPlayerNotify.ProtoReflect.Descriptor instead.
+func (*AddPlayerNotify) Descriptor() ([]byte, []int) {
+	return file_air_museum_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *AddPlayerNotify) GetUid() uint32 {
+	if x != nil {
+		return x.Uid
+	}
+	return 0
+}
+
+func (x *AddPlayerNotify) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *AddPlayerNotify) GetAge() uint32 {
+	if x != nil {
+		return x.Age
+	}
+	return 0
+}
+
+func (x *AddPlayerNotify) GetSex() int32 {
+	if x != nil {
+		return x.Sex
+	}
+	return 0
+}
+
+func (x *AddPlayerNotify) GetAvatarEyes() int32 {
+	if x != nil {
+		return x.AvatarEyes
+	}
+	return 0
+}
+
+func (x *AddPlayerNotify) GetAvatarEyebrow() int32 {
+	if x != nil {
+		return x.AvatarEyebrow
+	}
+	return 0
+}
+
+func (x *AddPlayerNotify) GetAvatarMouth() int32 {
+	if x != nil {
+		return x.AvatarMouth
+	}
+	return 0
+}
+
+func (x *AddPlayerNotify) GetAvatarGlasses() int32 {
+	if x != nil {
+		return x.AvatarGlasses
+	}
+	return 0
+}
+
+func (x *AddPlayerNotify) GetAvatarHelmet() int32 {
+	if x != nil {
+		return x.AvatarHelmet
+	}
+	return 0
+}
+
+func (x *AddPlayerNotify) GetMission() int32 {
+	if x != nil {
+		return x.Mission
+	}
+	return 0
+}
+
+func (x *AddPlayerNotify) GetGameScore() int32 {
+	if x != nil {
+		return x.GameScore
+	}
+	return 0
+}
+
+func (x *AddPlayerNotify) GetLandingScore() int32 {
+	if x != nil {
+		return x.LandingScore
+	}
+	return 0
+}
+
+func (x *AddPlayerNotify) GetRanking() int32 {
+	if x != nil {
+		return x.Ranking
+	}
+	return 0
+}
+
+func (x *AddPlayerNotify) GetCreattimeUnixSeconds() int64 {
+	if x != nil {
+		return x.CreattimeUnixSeconds
+	}
+	return 0
+}
+
 var File_air_museum_proto protoreflect.FileDescriptor
 
 const file_air_museum_proto_rawDesc = "" +
@@ -401,7 +550,25 @@ const file_air_museum_proto_rawDesc = "" +
 	"\x0eavatar_glasses\x18\f \x01(\x05R\ravatarGlasses\x12#\n" +
 	"\ravatar_helmet\x18\r \x01(\x05R\favatarHelmet\"\x1f\n" +
 	"\vErrorNotify\x12\x10\n" +
-	"\x03msg\x18\x01 \x01(\tR\x03msg*r\n" +
+	"\x03msg\x18\x01 \x01(\tR\x03msg\"\xc0\x03\n" +
+	"\x0fAddPlayerNotify\x12\x10\n" +
+	"\x03uid\x18\x01 \x01(\rR\x03uid\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x10\n" +
+	"\x03age\x18\x03 \x01(\rR\x03age\x12\x10\n" +
+	"\x03sex\x18\x04 \x01(\x05R\x03sex\x12\x1f\n" +
+	"\vavatar_eyes\x18\x05 \x01(\x05R\n" +
+	"avatarEyes\x12%\n" +
+	"\x0eavatar_eyebrow\x18\x06 \x01(\x05R\ravatarEyebrow\x12!\n" +
+	"\favatar_mouth\x18\a \x01(\x05R\vavatarMouth\x12%\n" +
+	"\x0eavatar_glasses\x18\b \x01(\x05R\ravatarGlasses\x12#\n" +
+	"\ravatar_helmet\x18\t \x01(\x05R\favatarHelmet\x12\x18\n" +
+	"\amission\x18\n" +
+	" \x01(\x05R\amission\x12\x1d\n" +
+	"\n" +
+	"game_score\x18\v \x01(\x05R\tgameScore\x12#\n" +
+	"\rlanding_score\x18\f \x01(\x05R\flandingScore\x12\x18\n" +
+	"\aranking\x18\r \x01(\x05R\aranking\x124\n" +
+	"\x16creattime_unix_seconds\x18\x0e \x01(\x03R\x14creattimeUnixSeconds*r\n" +
 	"\x06Action\x12\x16\n" +
 	"\x12ACTION_UNSPECIFIED\x10\x00\x12\x10\n" +
 	"\fACTION_ENTRY\x10\x01\x12\x10\n" +
@@ -428,13 +595,14 @@ func file_air_museum_proto_rawDescGZIP() []byte {
 }
 
 var file_air_museum_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_air_museum_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_air_museum_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_air_museum_proto_goTypes = []any{
-	(Action)(0),         // 0: air_museum.Action
-	(GamePhase)(0),      // 1: air_museum.GamePhase
-	(*GameState)(nil),   // 2: air_museum.GameState
-	(*PlayerInput)(nil), // 3: air_museum.PlayerInput
-	(*ErrorNotify)(nil), // 4: air_museum.ErrorNotify
+	(Action)(0),             // 0: air_museum.Action
+	(GamePhase)(0),          // 1: air_museum.GamePhase
+	(*GameState)(nil),       // 2: air_museum.GameState
+	(*PlayerInput)(nil),     // 3: air_museum.PlayerInput
+	(*ErrorNotify)(nil),     // 4: air_museum.ErrorNotify
+	(*AddPlayerNotify)(nil), // 5: air_museum.AddPlayerNotify
 }
 var file_air_museum_proto_depIdxs = []int32{
 	1, // 0: air_museum.GameState.state:type_name -> air_museum.GamePhase
@@ -457,7 +625,7 @@ func file_air_museum_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_air_museum_proto_rawDesc), len(file_air_museum_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

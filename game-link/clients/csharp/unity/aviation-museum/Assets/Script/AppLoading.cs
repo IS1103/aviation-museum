@@ -7,8 +7,14 @@ using UnityEngine.UI;
 public class AppLoading : MonoBehaviour
 {
     [Header("場景")]
-    [SerializeField] private Slider progressSlider;
+    [SerializeField] private Scrollbar progressScrollbar;
     [SerializeField] private string nextSceneName = "App";
+
+    [Tooltip("ScrollBar 追趕實際載入進度的速度（每秒 0～1）。場景載入很快時較大值可更快滿條；最後一段會自動加快避免卡死。")]
+    [SerializeField] private float progressCatchUpSpeed = 2.5f;
+
+    [Tooltip("條顯示 100% 後，再等幾幀才 allowSceneActivation，確保畫面有先畫出滿條。")]
+    [SerializeField] private int framesToShowFullBarBeforeActivate = 2;
 
     [Header("AirMuseum 連線")]
     [Tooltip("WebSocket 網址，需指向 air-museum 服務，例如 ws://192.168.1.100:8770/ws")]
@@ -24,6 +30,16 @@ public class AppLoading : MonoBehaviour
         _subscribed = true;
     }
 
+    // 進度條：size = 0～1（已載比例），value 固定 0 讓填色自軌道起點長出（Horizontal LTR 預設為由左填滿）。
+    private void ApplyProgressScrollbarVisual(float progress01)
+    {
+        if (progressScrollbar == null) return;
+
+        float p = Mathf.Clamp01(progress01);
+        progressScrollbar.value = 0f;
+        progressScrollbar.size = p;
+    }
+
     private void OnDestroy()
     {
         _destroyed = true;
@@ -37,11 +53,9 @@ public class AppLoading : MonoBehaviour
 
     private void Start()
     {
-        if (progressSlider != null)
+        if (progressScrollbar != null)
         {
-            progressSlider.minValue = 0f;
-            progressSlider.maxValue = 1f;
-            progressSlider.value = 0f;
+            ApplyProgressScrollbarVisual(0f);
         }
 
         BootFlowAsync().Forget();
@@ -77,24 +91,49 @@ public class AppLoading : MonoBehaviour
         AsyncOperation op = SceneManager.LoadSceneAsync(nextSceneName);
         op.allowSceneActivation = false;
 
+        float displayProgress = 0f;
+        bool activatedNextScene = false;
+        const float targetProgressEpsilon = 0.998f;
+
         while (!op.isDone)
         {
             if (_destroyed) return;
 
-            // Unity 的 progress 只會跑到 0.9，之後要等 allowSceneActivation = true 才會變成 1
-            float progress = Mathf.Clamp01(op.progress / 0.9f);
+            // Unity 的 AsyncOperation.progress 載入完成前只會跑到 0.9，之後卡住直到 allowSceneActivation = true。
+            bool loadStalledWaitingForActivation = op.progress >= 0.9f;
+            float targetProgress = loadStalledWaitingForActivation ? 1f : Mathf.Clamp01(op.progress / 0.9f);
 
-            if (progressSlider != null)
+            float delta = Mathf.Max(progressCatchUpSpeed, 8f); // 最後拉到 100% 時保底不要太慢
+            if (!loadStalledWaitingForActivation)
             {
-                progressSlider.value = progress;
+                delta = progressCatchUpSpeed;
             }
 
-            if (op.progress >= 0.9f)
+            displayProgress = Mathf.MoveTowards(displayProgress, targetProgress, Time.unscaledDeltaTime * delta);
+
+            if (progressScrollbar != null)
             {
-                if (progressSlider != null)
+                ApplyProgressScrollbarVisual(displayProgress);
+            }
+
+            if (loadStalledWaitingForActivation
+                && !activatedNextScene
+                && displayProgress >= targetProgressEpsilon)
+            {
+                activatedNextScene = true;
+                displayProgress = 1f;
+                if (progressScrollbar != null)
                 {
-                    progressSlider.value = 1f;
+                    ApplyProgressScrollbarVisual(1f);
                 }
+
+                var framesToWait = Mathf.Max(framesToShowFullBarBeforeActivate, 0);
+                while (framesToWait-- > 0)
+                {
+                    await UniTask.Yield();
+                    if (_destroyed) return;
+                }
+
                 op.allowSceneActivation = true;
             }
 

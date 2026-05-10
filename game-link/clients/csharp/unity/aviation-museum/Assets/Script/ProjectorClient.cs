@@ -14,9 +14,12 @@ namespace AirMuseum
         [Tooltip("服務端路徑為 /ws。若服務在 WSL、Unity 在 Windows，localhost 可能連不到，請在 WSL 執行 hostname -I 取得 IP，改填 ws://<IP>:8770/ws")]
         [SerializeField] private string wsUrl = "ws://localhost:8770/ws";
 
-        [Header("認證（投影端用 device=projector）")]
-        [Tooltip("投影端 token 不帶 key=uid，device 會指定為 projector（Server 固定 uid=1）")]
-        [SerializeField] private string authToken = "device=projector";
+        [Header("認證")]
+        [Tooltip("ValidateReq.Device，預設 gameScreen（遊戲投影幕）。token 留空。")]
+        [SerializeField] private string authDevice = "gameScreen";
+
+        [Tooltip("除錯用，一般留空")]
+        [SerializeField] private string authToken = "";
 
         [Header("目前遊戲階段（可透過程式或 UI 更新後呼叫 SendCurrentState）")]
         [SerializeField] private GamePhase currentPhase = GamePhase.WaitingEntry;
@@ -57,9 +60,9 @@ namespace AirMuseum
 
             var payload = new ValidateReq
             {
-                Token = authToken,
+                Token = authToken ?? "",
                 GateSid = "",
-                Device = "projector"
+                Device = authDevice
             };
             var resp = await svc.AuthAsync(payload);
             if (_destroyed) return;
