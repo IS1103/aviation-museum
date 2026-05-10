@@ -3197,7 +3197,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.99082136, b: 1, a: 1}
+  m_Color: {r: 0.66352195, g: 0.997361, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3206,7 +3206,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 89
+    m_FontSize: 61
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 5
@@ -26501,7 +26501,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.8375697, b: 1, a: 1}
+  m_Color: {r: 0.6666667, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -54996,7 +54996,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.99082136, b: 1, a: 1}
+  m_Color: {r: 0.66352195, g: 0.997361, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -55005,7 +55005,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 89
+    m_FontSize: 61
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 5
@@ -56593,28 +56593,28 @@ MonoBehaviour:
     normalSprite: {fileID: 21300000, guid: 55fbbb40dd872da428383603af7009ba, type: 3}
     pressedSprite: {fileID: 21300000, guid: 13a78965fa450db43b9fc80d81ba2440, type: 3}
     label: {fileID: 807797803}
-    normalColor: {r: 0, g: 0.99215686, b: 1, a: 1}
+    normalColor: {r: 0.6627451, g: 0.99607843, b: 1, a: 1}
     pressedColor: {r: 1, g: 0.8117647, b: 0.37254903, a: 1}
   - button: {fileID: 1219485806}
     image: {fileID: 6383720}
     normalSprite: {fileID: 21300000, guid: 7c89640bc3f081045b34d5446ba834ad, type: 3}
     pressedSprite: {fileID: 21300000, guid: 78b65470b5e00f04191fb121593fd6b6, type: 3}
     label: {fileID: 110913019}
-    normalColor: {r: 0, g: 0.99215686, b: 1, a: 1}
+    normalColor: {r: 0.6627451, g: 0.99607843, b: 1, a: 1}
     pressedColor: {r: 1, g: 0.8117647, b: 0.37254903, a: 1}
   - button: {fileID: 1848602294}
     image: {fileID: 945940924}
     normalSprite: {fileID: 21300000, guid: 5e8018b59e501c54998fa394c9d7423f, type: 3}
     pressedSprite: {fileID: 21300000, guid: 21af6034fcde3414f8152349fd9829c4, type: 3}
     label: {fileID: 1666413648}
-    normalColor: {r: 0, g: 0.99215686, b: 1, a: 1}
+    normalColor: {r: 0.6627451, g: 0.99607843, b: 1, a: 1}
     pressedColor: {r: 1, g: 0.8117647, b: 0.37254903, a: 1}
   - button: {fileID: 242745537}
     image: {fileID: 1602981337}
     normalSprite: {fileID: 21300000, guid: b03be824084038f40bbe9a2eb0f6cd65, type: 3}
     pressedSprite: {fileID: 21300000, guid: a0e8760edc7961245a7c364f12bf474a, type: 3}
     label: {fileID: 1127574983}
-    normalColor: {r: 0, g: 0.99215686, b: 1, a: 1}
+    normalColor: {r: 0.6627451, g: 0.99607843, b: 1, a: 1}
     pressedColor: {r: 1, g: 0.8117647, b: 0.37254903, a: 1}
 --- !u!111 &851003001
 Animation:
@@ -56623,7 +56623,7 @@ Animation:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 851002996}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   m_Animation: {fileID: 7400000, guid: 991f17391116689449db46aac4385917, type: 2}
   m_Animations:
@@ -83879,7 +83879,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.99082136, b: 1, a: 1}
+  m_Color: {r: 0.66352195, g: 0.997361, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -83888,7 +83888,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 89
+    m_FontSize: 61
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 5
@@ -133046,7 +133046,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.99082136, b: 1, a: 1}
+  m_Color: {r: 0.66352195, g: 0.997361, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -133055,7 +133055,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 89
+    m_FontSize: 61
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 5
